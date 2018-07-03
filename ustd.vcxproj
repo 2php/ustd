@@ -1,0 +1,278 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>15.0</VCProjectVersion>
+    <ProjectGuid>{72FAC65D-C779-4CFA-ADB3-1D261CDE226A}</ProjectGuid>
+    <RootNamespace>ustd</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>LLVM-vs2014</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>LLVM-vs2014</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings" />
+  <ImportGroup Label="Shared" />
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>$(SolutionDir)publish\bin\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>$(SolutionDir)publish\bin\</OutDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <ObjectFileName>$(IntDir)%(RelativeDir)%(FileName).obj</ObjectFileName>
+      <AdditionalIncludeDirectories>$(ProjectDir)src\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>config.inl</PrecompiledHeaderFile>
+      <ForcedIncludeFiles>config.inl</ForcedIncludeFiles>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ProgramDataBaseFileName>$(OutDir)$(ProjectName).pdb</ProgramDataBaseFileName>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <WarningLevel>Level4</WarningLevel>
+      <AdditionalOptions>-std:c++latest -Qunused-arguments %(AdditionalOptions)</AdditionalOptions>
+      <MinimalRebuild />
+    </ClCompile>
+    <PostBuildEvent />
+    <PostBuildEvent />
+    <PreBuildEvent />
+    <PostBuildEvent />
+    <Link />
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <AdditionalDependencies />
+      <ImportLibrary>$(OutDir)..\lib\$(TargetName).lib</ImportLibrary>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <ObjectFileName>$(IntDir)%(RelativeDir)%(FileName).obj</ObjectFileName>
+      <AdditionalIncludeDirectories>$(ProjectDir)src\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ForcedIncludeFiles>config.inl</ForcedIncludeFiles>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>config.inl</PrecompiledHeaderFile>
+      <ProgramDataBaseFileName>$(OutDir)$(ProjectName).pdb</ProgramDataBaseFileName>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <WarningLevel>Level4</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <AdditionalOptions>-std:c++latest -Qunused-arguments %(AdditionalOptions)</AdditionalOptions>
+      <MinimalRebuild />
+    </ClCompile>
+    <PostBuildEvent />
+    <PostBuildEvent />
+    <PreBuildEvent />
+    <PostBuildEvent />
+    <Link />
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <AdditionalDependencies />
+      <ImportLibrary>$(OutDir)..\lib\$(TargetName).lib</ImportLibrary>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="src\ustd.h" />
+    <ClInclude Include="src\ustd\core.h" />
+    <ClInclude Include="src\ustd\core\boxed.h" />
+    <ClInclude Include="src\ustd\core\fn.h" />
+    <ClInclude Include="src\ustd\core\iter.h" />
+    <ClInclude Include="src\ustd\core\mem.h" />
+    <ClInclude Include="src\ustd\core\num.h" />
+    <ClInclude Include="src\ustd\core\ops.h" />
+    <ClInclude Include="src\ustd\core\panic.h" />
+    <ClInclude Include="src\ustd\core\enum.h" />
+    <ClInclude Include="src\ustd\core\fmt.h" />
+    <ClInclude Include="src\ustd\core\option.h" />
+    <ClInclude Include="src\ustd\core\property.h" />
+    <ClInclude Include="src\ustd\core\result.h" />
+    <ClInclude Include="src\ustd\core\sync.h" />
+    <ClInclude Include="src\ustd\core\type.h" />
+    <ClInclude Include="src\ustd\core\tuple.h" />
+    <ClInclude Include="src\ustd\core\vec.h" />
+    <ClInclude Include="src\ustd\core\slice.h" />
+    <ClInclude Include="src\ustd\core\str.h" />
+    <ClInclude Include="src\ustd\core\string.h" />
+    <ClInclude Include="src\ustd\core\builtin.h" />
+    <ClInclude Include="src\ustd\core\list.h" />
+    <ClInclude Include="src\ustd\cuda.h" />
+    <ClInclude Include="src\ustd\cuda\api.h" />
+    <ClInclude Include="src\ustd\cuda\array.h" />
+    <ClInclude Include="src\ustd\cuda\kernel.h" />
+    <ClInclude Include="src\ustd\cuda\tex.h" />
+    <ClInclude Include="src\ustd\env.h" />
+    <ClInclude Include="src\ustd\ffi.h" />
+    <ClInclude Include="src\ustd\ffi\mod.h" />
+    <ClInclude Include="src\ustd\fs.h" />
+    <ClInclude Include="src\ustd\fs\file.h" />
+    <ClInclude Include="src\ustd\fs\path.h" />
+    <ClInclude Include="src\ustd\io.h" />
+    <ClInclude Include="src\ustd\io\console.h" />
+    <ClInclude Include="src\ustd\log.h" />
+    <ClInclude Include="src\ustd\log\logger.h" />
+    <ClInclude Include="src\ustd\math.h" />
+    <ClInclude Include="src\ustd\math\ndarray.h" />
+    <ClInclude Include="src\ustd\math\mkl.h" />
+    <ClInclude Include="src\ustd\math\complex.h" />
+    <ClInclude Include="src\ustd\math\ops.h" />
+    <ClInclude Include="src\ustd\math\ndslice.h" />
+    <ClInclude Include="src\ustd\math\vfun.h" />
+    <ClInclude Include="src\ustd\os.h" />
+    <ClInclude Include="src\ustd\os\posix.h" />
+    <ClInclude Include="src\ustd\os\unix.h" />
+    <ClInclude Include="src\ustd\os\windows.h" />
+    <ClInclude Include="src\ustd\serialization.h" />
+    <ClInclude Include="src\ustd\serialization\dom.h" />
+    <ClInclude Include="src\ustd\serialization\func.h" />
+    <ClInclude Include="src\ustd\sync.h" />
+    <ClInclude Include="src\ustd\sync\arc.h" />
+    <ClInclude Include="src\ustd\sync\atomic.h" />
+    <ClInclude Include="src\ustd\sync\barrier.h" />
+    <ClInclude Include="src\ustd\sync\condvar.h" />
+    <ClInclude Include="src\ustd\sync\mutex.h" />
+    <ClInclude Include="src\ustd\sync\rwlock.h" />
+    <ClInclude Include="src\ustd\task.h" />
+    <ClInclude Include="src\ustd\task\scheduler.h" />
+    <ClInclude Include="src\ustd\task\task.h" />
+    <ClInclude Include="src\ustd\test.h" />
+    <ClInclude Include="src\ustd\test\assert.h" />
+    <ClInclude Include="src\ustd\test\scheduler.h" />
+    <ClInclude Include="src\ustd\test\unittest.h" />
+    <ClInclude Include="src\ustd\thread.h" />
+    <ClInclude Include="src\ustd\thread\pool.h" />
+    <ClInclude Include="src\ustd\thread\funcs.h" />
+    <ClInclude Include="src\ustd\thread\thread.h" />
+    <ClInclude Include="src\ustd\time.h" />
+    <ClInclude Include="src\ustd\time\time.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\mod.cc" />
+    <ClCompile Include="src\ustd\core\iter.cc" />
+    <ClCompile Include="src\ustd\core\mem.cc" />
+    <ClCompile Include="src\ustd\core\num.cc" />
+    <ClCompile Include="src\ustd\core\option.cc" />
+    <ClCompile Include="src\ustd\core\panic.cc">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="src\ustd\core\result.cc" />
+    <ClCompile Include="src\ustd\core\str.cc" />
+    <ClCompile Include="src\ustd\core\tuple.cc" />
+    <ClCompile Include="src\ustd\core\list.cc" />
+    <ClCompile Include="src\ustd\core\type.cc" />
+    <ClCompile Include="src\ustd\core\vec.cc" />
+    <ClCompile Include="src\ustd\cuda\api.cc" />
+    <ClCompile Include="src\ustd\cuda\tex.cc" />
+    <ClCompile Include="src\ustd\env.cc" />
+    <ClCompile Include="src\ustd\ffi\mod.cc" />
+    <ClCompile Include="src\ustd\fs\file.cc" />
+    <ClCompile Include="src\ustd\fs\path.cc" />
+    <ClCompile Include="src\ustd\io\console.cc" />
+    <ClCompile Include="src\ustd\log\logger.cc" />
+    <ClCompile Include="src\ustd\math\complex.cc" />
+    <ClCompile Include="src\ustd\math\ndarray.cc" />
+    <ClCompile Include="src\ustd\math\mkl.cc" />
+    <ClCompile Include="src\ustd\math\vfun.cc" />
+    <ClCompile Include="src\ustd\os\posix.cc" />
+    <ClCompile Include="src\ustd\os\windows.cc" />
+    <ClCompile Include="src\ustd\serialization\dom.cc" />
+    <ClCompile Include="src\ustd\serialization\func.cc" />
+    <ClCompile Include="src\ustd\serialization\json.cc" />
+    <ClCompile Include="src\ustd\serialization\xml.cc" />
+    <ClCompile Include="src\ustd\sync\condvar.cc" />
+    <ClCompile Include="src\ustd\sync\mutex.cc" />
+    <ClCompile Include="src\ustd\task\scheduler.cc" />
+    <ClCompile Include="src\ustd\task\task.cc" />
+    <ClCompile Include="src\ustd\test\scheduler.cc" />
+    <ClCompile Include="src\ustd\thread\pool.cc" />
+    <ClCompile Include="src\ustd\thread\funcs.cc" />
+    <ClCompile Include="src\ustd\core\fmt.cc" />
+    <ClCompile Include="src\ustd\thread\thread.cc" />
+    <ClCompile Include="src\ustd\thread\thread_windows.cc" />
+    <ClCompile Include="src\ustd\thread\thread_unix.cc">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="src\ustd\time\time.cc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="src\ustd.natvis">
+      <SubType>Designer</SubType>
+    </Natvis>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\config.inl">
+      <FileType>Document</FileType>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="external\cuda\cudart64_92.dll">
+      <Link>cudart64_92.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="external\mkl\libimalloc.dll">
+      <Link>libimalloc.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="external\mkl\libiomp5md.dll">
+      <Link>libiomp5md.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="external\mkl\mkl_avx.dll">
+      <Link>mkl_avx.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="external\mkl\mkl_avx2.dll">
+      <Link>mkl_avx2.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="external\mkl\mkl_avx512.dll">
+      <Link>mkl_avx512.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="external\mkl\mkl_core.dll">
+      <Link>mkl_core.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="external\mkl\mkl_intel_thread.dll">
+      <Link>mkl_intel_thread.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="external\mkl\mkl_rt.dll">
+      <Link>mkl_rt.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="external\vcruntime\vcruntime140.dll">
+      <Link>vcruntime140.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="external\vcruntime\vcruntime140d.dll">
+      <Link>vcruntime140d.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets" />
+</Project>

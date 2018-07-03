@@ -1,0 +1,443 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Natvis Include="src\ustd.natvis" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\ustd\io\console.cc">
+      <Filter>ustd\io</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ustd\serialization\dom.cc">
+      <Filter>ustd\serialization</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ustd\core\fmt.cc">
+      <Filter>ustd\core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ustd\thread\funcs.cc">
+      <Filter>ustd\thread</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ustd\serialization\json.cc">
+      <Filter>ustd\serialization</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ustd\core\panic.cc">
+      <Filter>ustd\core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ustd\core\str.cc">
+      <Filter>ustd\core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ustd\serialization\xml.cc">
+      <Filter>ustd\serialization</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ustd\test\scheduler.cc">
+      <Filter>ustd\test</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ustd\time\time.cc">
+      <Filter>ustd\time</Filter>
+    </ClCompile>
+    <ClCompile Include="src\config.inl" />
+    <ClCompile Include="src\ustd\core\option.cc">
+      <Filter>ustd\core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ustd\core\mem.cc">
+      <Filter>ustd\core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ustd\env.cc">
+      <Filter>ustd</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ustd\log\logger.cc">
+      <Filter>ustd\log</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ustd\sync\mutex.cc">
+      <Filter>ustd\sync</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ustd\ffi\mod.cc">
+      <Filter>ustd\ffi</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mod.cc" />
+    <ClCompile Include="src\ustd\cuda\api.cc">
+      <Filter>ustd\cuda</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ustd\fs\path.cc">
+      <Filter>ustd\fs</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ustd\fs\file.cc">
+      <Filter>ustd\fs</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ustd\os\posix.cc">
+      <Filter>ustd\os</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ustd\math\mkl.cc">
+      <Filter>ustd\math</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ustd\sync\condvar.cc">
+      <Filter>ustd\sync</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ustd\thread\pool.cc">
+      <Filter>ustd\thread</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ustd\math\complex.cc">
+      <Filter>ustd\math</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ustd\os\windows.cc">
+      <Filter>ustd\os</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ustd\math\ndarray.cc">
+      <Filter>ustd\math</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ustd\core\num.cc">
+      <Filter>ustd\core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ustd\core\iter.cc">
+      <Filter>ustd\core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ustd\task\task.cc">
+      <Filter>ustd\task</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ustd\core\list.cc">
+      <Filter>ustd\core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ustd\core\tuple.cc">
+      <Filter>ustd\core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ustd\core\type.cc">
+      <Filter>ustd\core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ustd\math\vfun.cc">
+      <Filter>ustd\math</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ustd\serialization\func.cc">
+      <Filter>ustd\serialization</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ustd\cuda\tex.cc">
+      <Filter>ustd\cuda</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ustd\core\vec.cc">
+      <Filter>ustd\core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ustd\core\result.cc">
+      <Filter>ustd\core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ustd\thread\thread_unix.cc">
+      <Filter>ustd\thread</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ustd\thread\thread_windows.cc">
+      <Filter>ustd\thread</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ustd\thread\thread.cc">
+      <Filter>ustd\thread</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ustd\task\scheduler.cc">
+      <Filter>ustd\task</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\ustd\sync\arc.h">
+      <Filter>ustd\sync</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ustd\sync\barrier.h">
+      <Filter>ustd\sync</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ustd\sync\condvar.h">
+      <Filter>ustd\sync</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ustd\io\console.h">
+      <Filter>ustd\io</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ustd\serialization\dom.h">
+      <Filter>ustd\serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ustd\core\enum.h">
+      <Filter>ustd\core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ustd\core\fmt.h">
+      <Filter>ustd\core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ustd\thread\funcs.h">
+      <Filter>ustd\thread</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ustd\core\iter.h">
+      <Filter>ustd\core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ustd\core\mem.h">
+      <Filter>ustd\core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ustd\core\result.h">
+      <Filter>ustd\core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ustd\sync\mutex.h">
+      <Filter>ustd\sync</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ustd\core\panic.h">
+      <Filter>ustd\core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ustd\core\option.h">
+      <Filter>ustd\core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ustd\core\str.h">
+      <Filter>ustd\core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ustd\core\string.h">
+      <Filter>ustd\core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ustd\thread\thread.h">
+      <Filter>ustd\thread</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ustd\test\assert.h">
+      <Filter>ustd\test</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ustd\time\time.h">
+      <Filter>ustd\time</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ustd\core.h">
+      <Filter>ustd</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ustd\env.h">
+      <Filter>ustd</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ustd\ffi.h">
+      <Filter>ustd</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ustd\io.h">
+      <Filter>ustd</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ustd\math.h">
+      <Filter>ustd</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ustd\serialization.h">
+      <Filter>ustd</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ustd\sync.h">
+      <Filter>ustd</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ustd\thread.h">
+      <Filter>ustd</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ustd\test.h">
+      <Filter>ustd</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ustd\time.h">
+      <Filter>ustd</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ustd\test\scheduler.h">
+      <Filter>ustd\test</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ustd\core\boxed.h">
+      <Filter>ustd\core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ustd.h" />
+    <ClInclude Include="src\ustd\log\logger.h">
+      <Filter>ustd\log</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ustd\log.h">
+      <Filter>ustd</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ustd\core\ops.h">
+      <Filter>ustd\core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ustd\os.h">
+      <Filter>ustd</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ustd\sync\rwlock.h">
+      <Filter>ustd\sync</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ustd\os\unix.h">
+      <Filter>ustd\os</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ustd\os\windows.h">
+      <Filter>ustd\os</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ustd\os\posix.h">
+      <Filter>ustd\os</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ustd\ffi\mod.h">
+      <Filter>ustd\ffi</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ustd\cuda\api.h">
+      <Filter>ustd\cuda</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ustd\cuda.h">
+      <Filter>ustd</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ustd\cuda\array.h">
+      <Filter>ustd\cuda</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ustd\fs.h">
+      <Filter>ustd</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ustd\fs\path.h">
+      <Filter>ustd\fs</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ustd\fs\file.h">
+      <Filter>ustd\fs</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ustd\math\complex.h">
+      <Filter>ustd\math</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ustd\math\mkl.h">
+      <Filter>ustd\math</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ustd\core\num.h">
+      <Filter>ustd\core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ustd\core\fn.h">
+      <Filter>ustd\core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ustd\thread\pool.h">
+      <Filter>ustd\thread</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ustd\sync\atomic.h">
+      <Filter>ustd\sync</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ustd\math\ndarray.h">
+      <Filter>ustd\math</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ustd\core\vec.h">
+      <Filter>ustd\core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ustd\task\task.h">
+      <Filter>ustd\task</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ustd\core\list.h">
+      <Filter>ustd\core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ustd\core\slice.h">
+      <Filter>ustd\core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ustd\math\ndslice.h">
+      <Filter>ustd\math</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ustd\core\sync.h">
+      <Filter>ustd\core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ustd\core\builtin.h">
+      <Filter>ustd\core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ustd\core\tuple.h">
+      <Filter>ustd\core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ustd\core\type.h">
+      <Filter>ustd\core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ustd\math\vfun.h">
+      <Filter>ustd\math</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ustd\math\ops.h">
+      <Filter>ustd\math</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ustd\serialization\func.h">
+      <Filter>ustd\serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ustd\task.h">
+      <Filter>ustd</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ustd\cuda\tex.h">
+      <Filter>ustd\cuda</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ustd\cuda\kernel.h">
+      <Filter>ustd\cuda</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ustd\core\property.h">
+      <Filter>ustd\core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ustd\test\unittest.h">
+      <Filter>ustd\test</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ustd\task\scheduler.h">
+      <Filter>ustd\task</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="ustd">
+      <UniqueIdentifier>{3625e5e7-1491-43ca-b5fc-e4fe5b1d8a13}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ustd\ffi">
+      <UniqueIdentifier>{d6c3129b-ddbd-4431-99f5-7a0d084079cf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ustd\core">
+      <UniqueIdentifier>{d89cc9a8-56b7-4af5-9e04-2b4bfe377e7f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ustd\io">
+      <UniqueIdentifier>{7cc61901-4e00-4364-bc5d-18749ceb96d5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ustd\math">
+      <UniqueIdentifier>{5cc960ee-a5fa-476e-8e2c-b6771b6145a2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ustd\log">
+      <UniqueIdentifier>{4ccf45e9-f776-48c2-8d3a-4e2b578dcd8e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ustd\time">
+      <UniqueIdentifier>{5fca4391-9d44-4ff5-b8ff-d00b58e82652}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ustd\test">
+      <UniqueIdentifier>{0bd71136-82ea-4e83-8be6-70290cfc4e73}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ustd\thread">
+      <UniqueIdentifier>{1ed8feb0-68df-4995-b7e5-8771c86d35d9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ustd\serialization">
+      <UniqueIdentifier>{f1237499-57e9-44f1-8eea-2331f202f949}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ustd\sync">
+      <UniqueIdentifier>{3b89d944-4e16-43b8-bb68-446c4d1dea1c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ustd\os">
+      <UniqueIdentifier>{b99c37c1-f8e1-47eb-ae07-4b8055da20d0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ustd\cuda">
+      <UniqueIdentifier>{6861c971-c446-4dc0-aa42-9a1d93421a83}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ustd\fs">
+      <UniqueIdentifier>{f0ca4f26-63dc-45d8-acd2-6de9cd1f2187}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ustd\task">
+      <UniqueIdentifier>{6b3fd8a4-5417-475e-8521-438fa1d5fa5e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="external">
+      <UniqueIdentifier>{13d5d41b-69b6-4a31-b94a-f6ff6f97ab1d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="external\cuda">
+      <UniqueIdentifier>{42b74b27-3f0f-43b5-b9e3-d01246a6a642}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="external\mkl">
+      <UniqueIdentifier>{4dc6c3cb-37e8-485c-8bbd-d082f0191382}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="external\vcruntime">
+      <UniqueIdentifier>{db69c631-23e5-4b69-9e1e-669c0026aae7}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="external\cuda\cudart64_92.dll">
+      <Filter>external\cuda</Filter>
+    </None>
+    <None Include="external\mkl\libimalloc.dll">
+      <Filter>external\mkl</Filter>
+    </None>
+    <None Include="external\mkl\libiomp5md.dll">
+      <Filter>external\mkl</Filter>
+    </None>
+    <None Include="external\mkl\mkl_avx.dll">
+      <Filter>external\mkl</Filter>
+    </None>
+    <None Include="external\mkl\mkl_avx2.dll">
+      <Filter>external\mkl</Filter>
+    </None>
+    <None Include="external\mkl\mkl_avx512.dll">
+      <Filter>external\mkl</Filter>
+    </None>
+    <None Include="external\mkl\mkl_core.dll">
+      <Filter>external\mkl</Filter>
+    </None>
+    <None Include="external\mkl\mkl_intel_thread.dll">
+      <Filter>external\mkl</Filter>
+    </None>
+    <None Include="external\mkl\mkl_rt.dll">
+      <Filter>external\mkl</Filter>
+    </None>
+    <None Include="external\vcruntime\vcruntime140.dll">
+      <Filter>external\vcruntime</Filter>
+    </None>
+    <None Include="external\vcruntime\vcruntime140d.dll">
+      <Filter>external\vcruntime</Filter>
+    </None>
+  </ItemGroup>
+</Project>

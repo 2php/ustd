@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+
+  <!-- ustd::None-->
+  <Type Name="ustd::None">
+    <DisplayString></DisplayString>
+  </Type>
+
+
+
+  <!-- ustd::Union -->
+  <Type Name="ustd::Union&lt;*,*&gt;">
+    <Expand>
+      <Item Name="[idx]">int(_id)</Item>
+      <Item Name="[val]" Condition="_id==0">$0</Item>
+      <Item Name="[val]" Condition="_id==1">$1</Item>
+    </Expand>
+  </Type>
+
+  <!--ustd::option::Option-->
+  <Type Name="ustd::option::Option&lt;*&gt;">
+    <DisplayString Condition="_id==0">None()</DisplayString>
+    <DisplayString Condition="_id==1">Some({$1})</DisplayString>
+  </Type>
+
+  <!--ustd::result::Result-->
+  <Type Name="ustd::result::Result&lt;*,*&gt;">
+    <DisplayString Condition="_id==0">Ok({$0})</DisplayString>
+    <DisplayString Condition="_id==1">Err({$1})</DisplayString>
+  </Type>
+
+  <!-- ustd::array<T, N> -->
+  <Type Name="ustd::array&lt;*,*&gt;">
+    <Expand>
+      <ArrayItems>
+        <Size>$T2</Size>
+        <ValuePointer>_data</ValuePointer>
+      </ArrayItems>
+    </Expand>
+  </Type>
+
+  <!-- ustd::Slice<T>-->
+  <Type Name="ustd::Slice&lt;*&gt;">
+    <Expand>
+      <Item Name="[size]">_size</Item>
+      <Item Name="[capacity]">_capacity</Item>
+      <ArrayItems>
+        <Size>_size</Size>
+        <ValuePointer>_data</ValuePointer>
+      </ArrayItems>
+    </Expand>
+  </Type>
+
+  <!--str = ustd::View<char>-->
+  <Type Name="ustd::Slice&lt;char&gt;">
+    <DisplayString Condition="_size !=0">{_data, [_size]s}</DisplayString>
+    <DisplayString Condition="_size ==0">{{nullptr}} </DisplayString>
+    <Expand>
+      <Item Name="[size]">_size</Item>
+      <ArrayItems Condition="_size != 0">
+        <Size>_size</Size>
+        <ValuePointer>_data</ValuePointer>
+      </ArrayItems>
+    </Expand>
+  </Type>
+
+  <!--str = ustd::Slice<const char>-->
+  <Type Name="ustd::Slice&lt;const char&gt;">
+    <DisplayString Condition="_size !=0">{_data, [_size]s}</DisplayString>
+    <DisplayString Condition="_size ==0">{{nullptr}} </DisplayString>
+    <Expand>
+      <Item Name="[size]">_size</Item>
+      <ArrayItems Condition="_size != 0">
+        <Size>_size</Size>
+        <ValuePointer>_data</ValuePointer>
+      </ArrayItems>
+    </Expand>
+  </Type>
+
+  <!--ustd::time::Time-->
+  <Type Name="ustd::time::Instant">
+    <DisplayString>{_secs + _nanos*0.000000001}</DisplayString>
+  </Type>
+  
+  <!--ustd::vec::Deque<T>-->
+  <Type Name="ustd::vec::Deque&lt;*&gt;">
+    <Expand>
+      <Item Name="[size]">_size</Item>
+      <IndexListItems>
+        <Size>_size</Size>
+        <ValueNode>_data[(_head+$i)%_capacity]</ValueNode>
+      </IndexListItems>
+    </Expand>
+  </Type>
+
+  <!--ustd::math::NDArray<*,*>-->
+  <Type Name="ustd::math::NDArray&lt;*,*&gt;">
+    <DisplayString>[dims] = {_dims}</DisplayString>
+    <Expand>
+      <Item Name="[dims]">_dims</Item>
+      <Item Name="[step]">_step</Item>
+      <ArrayItems>
+        <Rank>$T2</Rank>
+        <Size>_dims._arr[$i]</Size>
+        <ValuePointer>_data</ValuePointer>
+      </ArrayItems>
+    </Expand>
+  </Type>
+
+  <Type Name="ustd::serialization::Node">
+    <DisplayString Condition="_type==0">null</DisplayString>
+    <DisplayString Condition="_type==1">{_bool}</DisplayString>
+    <DisplayString Condition="_type==2">{_i8}</DisplayString>
+    <DisplayString Condition="_type==3">{_u8}</DisplayString>
+    <DisplayString Condition="_type==4">{_i16}</DisplayString>
+    <DisplayString Condition="_type==5">{_u16}</DisplayString>
+    <DisplayString Condition="_type==6">{_i32}</DisplayString>
+    <DisplayString Condition="_type==7">{_u32}</DisplayString>
+    <DisplayString Condition="_type==8">{_i64}</DisplayString>
+    <DisplayString Condition="_type==9">{_u64}</DisplayString>
+    
+    <DisplayString Condition="_type==10">{_f32}</DisplayString>
+    <DisplayString Condition="_type==11">{_f64}</DisplayString>
+
+    <DisplayString Condition="_type==12">{_str, [_size]sb}</DisplayString>
+    <DisplayString Condition="_type==13">{_str, [_size]s}=></DisplayString>
+    <DisplayString Condition="_type==14">{_str, [_size]s}</DisplayString>
+    
+    <DisplayString Condition="_type==16">array[{_size}]</DisplayString>
+    <DisplayString Condition="_type==17">object[{_size}]</DisplayString>
+  </Type>
+</AutoVisualizer>
