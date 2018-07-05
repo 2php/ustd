@@ -92,7 +92,7 @@ pub fn Thread::set_name(str name)  noexcept -> void {
 
 }
 
-pub fn Thread::get_name() const noexcept -> FixedStr<256> {
+pub fn Thread::name() const noexcept -> FixedStr<256> {
     if (!is_valid()) {
         return {};
     }
@@ -120,7 +120,7 @@ pub fn Thread::get_name() const noexcept -> FixedStr<256> {
     return name;
 }
 
-pub fn Thread::get_id() const noexcept -> u64 {
+pub fn Thread::id() const noexcept -> u64 {
     if (!is_valid()) return 0u;
 
     let tid = ::GetThreadId(_thr);

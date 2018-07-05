@@ -42,10 +42,10 @@ namespace ustd
 {
 
 #pragma region types: primitive types
-using i8        = __int8;     using u8  = unsigned __int8;
-using i16       = __int16;    using u16 = unsigned __int16;
-using i32       = __int32;    using u32 = unsigned __int32;
-using i64       = __int64;    using u64 = unsigned __int64;
+using i8        = __INT8_TYPE__;     using u8  = __UINT8_TYPE__;
+using i16       = __INT16_TYPE__;    using u16 = __UINT16_TYPE__;
+using i32       = __INT32_TYPE__;    using u32 = __UINT32_TYPE__;
+using i64       = __INT64_TYPE__;    using u64 = __UINT64_TYPE__;
 
 using f32       = float;
 using f64       = double;
@@ -58,9 +58,6 @@ using ushort    = unsigned short;
 using uint      = unsigned int;
 using ulong     = unsigned long;
 using ullong    = unsigned long long;
-
-using isize     = decltype(static_cast<byte*>(nullptr) - static_cast<byte*>(nullptr));
-using usize     = decltype(sizeof(0));
 
 template<class ...U>
 using void_t = void;

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ustd/core.h"
+#include "ustd/os.h"
 
 namespace ustd::sync
 {
@@ -38,10 +39,10 @@ public:
 
     pub fn to_str() const noexcept -> FixedStr<32>;
 
-    pub fn lock() noexcept -> Guard;
+    pub fn lock() noexcept -> Result<Guard>;
 
 protected:
-    pub fn unlock() noexcept -> void;
+    pub fn unlock() noexcept -> Result<void>;
 };
 
 class Mutex::Guard

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ustd/core.h"
+#include "ustd/os.h"
 
 namespace ustd::thread
 {
@@ -34,16 +35,14 @@ struct Thread
         other._thr = thr_t::Invalid;
     }
 
-    __declspec(property(get = get_id)) u64 id;
-    pub fn get_id() const     noexcept -> u64;
+    pub fn id()                 const noexcept -> u64;
 
-    __declspec(property(get = get_name, put = set_name)) FixedStr<256> name;
-    pub fn get_name()         const noexcept -> FixedStr<256>;
-    pub fn set_name(str name)       noexcept -> void;
+    pub fn name()               const noexcept -> FixedStr<256>;
+    pub fn set_name(str name)         noexcept -> void;
 
-    pub fn is_valid() const noexcept -> bool;
-    pub fn detach()         noexcept -> void;
-    pub fn join()           noexcept -> Result<void>;
+    pub fn is_valid()           const noexcept -> bool;
+    pub fn detach()                   noexcept -> void;
+    pub fn join()                     noexcept -> Result<void>;
 
 };
 
@@ -88,13 +87,13 @@ public:
 
 struct Builder
 {
-    usize   _stack  = 0;
-    str     _name   = "";
+    u64  _stack  = 0;
+    str  _name   = "";
 
     Builder() noexcept
     {}
 
-    fn set_stack(usize stack) -> Builder& {
+    fn set_stack(u64 stack) -> Builder& {
         _stack = stack;
         return *this;
     }

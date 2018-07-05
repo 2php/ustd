@@ -1,8 +1,8 @@
 #pragma once
 
-#include "ustd/os/posix.h"
-#include "ustd/os/windows.h"
-#include "ustd/os/unix.h"
+#include "ustd/os/os_posix.h"
+#include "ustd/os/os_unix.h"
+#include "ustd/os/os_win32.h"
 
 namespace ustd::os
 {

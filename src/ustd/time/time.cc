@@ -35,12 +35,12 @@ static fn clock_gettime(ClockId clk_id, struct timespec *res) -> i32 {
 
 #endif
 
-#ifdef USTD_OS_LINUX
+#if defined(USTD_OS_LINUX) || defined(USTD_OS_MACOS)
 
 static constexpr let TIME_UTC = CLOCK_REALTIME;
 
-static fn timespec_get(int base, struct timespec* time) -> xx {
-    let res = ::clock_gettime(base, time);
+static fn timespec_get(struct timespec* time, int base) -> int {
+    let res = ::clock_gettime(clockid_t(base), time);
     return res;
 }
 

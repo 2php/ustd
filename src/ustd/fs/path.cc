@@ -40,8 +40,8 @@ namespace ustd::fs
 
 pub fn Path::get_fullpath() const noexcept -> FixedCStr<1024> {
     static let exe_path = current_exe();
-    static let bin_path = exe_path.parrent;
-    static let app_path = bin_path.parrent;
+    static let bin_path = exe_path.parent();
+    static let app_path = bin_path.parent();
 
     mut res = FixedCStr<1024>();
     mut s   = str(*this);
@@ -62,7 +62,7 @@ pub fn Path::get_fullpath() const noexcept -> FixedCStr<1024> {
 
     if (s.starts_with(str("#/"))) {
         if (res.push_slice(app_path).is_none()) { goto ERROR; }
-        s = s.slice(1u, s.len - 1);
+        s = s.slice(1u, s._size - 1);
     }
 
     if (res.push_slice(s).is_none()) goto ERROR;
@@ -81,13 +81,13 @@ ERROR:
     return {};
 }
 
-pub fn Path::get_parent() const noexcept -> Path {
+pub fn Path::parent() const noexcept -> Path {
     if (this->is_empty()) return {};
 
     // #####/#####
     //      ^
     //     idx
-    mut idx = this->len - 1;
+    mut idx = this->_size - 1;
     while (idx > 0 && _data[idx] != '/') {
         --idx;
     }
@@ -98,10 +98,10 @@ pub fn Path::get_parent() const noexcept -> Path {
     return p;
 }
 
-pub fn Path::get_file_name() const noexcept -> Path {
+pub fn Path::file_name() const noexcept -> Path {
     if (this->is_empty()) return {};
 
-    let len = this->len;
+    let len = this->_size;
     if (len == 0)               return {};
     if (_data[len - 1] == '/')  return {};
 
@@ -117,16 +117,16 @@ pub fn Path::get_file_name() const noexcept -> Path {
     return s;
 }
 
-pub fn Path::get_extension() const noexcept -> Path {
+pub fn Path::extension() const noexcept -> Path {
     if (this->is_empty()) return {};
 
-    let name = get_file_name();
+    let name = file_name();
     if (name.is_empty()) return {};
 
     // #####.#####
     //      ^
     //     idx
-    let  len = name.len;
+    let  len = name._size;
     mut  idx = len - 1;
 
     while (idx > 0 && _data[idx] != '.') { --idx; }
@@ -143,7 +143,7 @@ pub fn Path::is_file() const noexcept -> bool {
     let full_path = get_fullpath();
 
     struct ::_stat64 st;
-    let eid = ::_stat64(full_path.data, &st);
+    let eid = ::_stat64(full_path._data, &st);
     if (eid != 0) return false;
 
     return st.st_mode == S_IFREG;
@@ -155,7 +155,7 @@ pub fn Path::is_dir() const noexcept -> bool {
     let full_path = get_fullpath();
 
     struct ::_stat64 st;
-    let eid = ::_stat64(full_path.data, &st);
+    let eid = ::_stat64(full_path._data, &st);
     if (eid != 0) {
         log::error("ustd::fs::Path[`{}`, path=`{}`].is_dir(): failed, error={}", this, *this, eid);
         return false;
@@ -167,7 +167,7 @@ pub fn Path::is_dir() const noexcept -> bool {
 pub fn Path::is_exists() const noexcept -> bool {
     let full_path = get_fullpath();
 
-    let stat = ::_access(full_path.data, 0);
+    let stat = ::_access(full_path._data, 0);
     return stat == 0;
 }
 
@@ -176,11 +176,11 @@ pub fn Path::is_exists() const noexcept -> bool {
 pub fn current_dir() noexcept -> Path {
     static thread_local FixedStr<FixedPath<>::$capacity> s;
 
-    let ptr = ::_getcwd(s.data, i32(s.capacity));
+    let ptr = ::_getcwd(s._data, i32(s._capacity));
     if (ptr == nullptr) {
         return {};
     }
-    let tmp = cstr(s.data);
+    let tmp = cstr(s._data);
     s._size = tmp._size;
 
     return str(s);
@@ -189,7 +189,7 @@ pub fn current_dir() noexcept -> Path {
 pub fn set_current_dir(Path path) noexcept -> Result<none_t> {
     let full_path = path.get_fullpath();
 
-    let stat = ::_chdir(full_path.data);
+    let stat = ::_chdir(full_path._data);
     if (stat != 0) {
         let eid = os::get_error();
         log::error("ustd::fs::set_current_dir(path=`{}`): failed, error={}", path, eid);
@@ -203,19 +203,19 @@ pub fn set_current_dir(Path path) noexcept -> Result<none_t> {
 pub fn current_exe() noexcept -> Path {
     static FixedStr<FixedPath<>::$capacity> res;
 
-#ifdef _WIN32
+#ifdef USTD_OS_WINDOWS
     let mod = ::GetModuleHandleA(nullptr);
     let len = ::GetModuleFileNameA(mod, res._data, res.capacity);
     res._size = len;
     res.replace('\\', '/');
 #endif
 
-#ifdef __APPLE__
-    res._size = res.capacity;
-    _NSGetExecutablePath(tmp, &tmp._size);
+#ifdef USTD_OS_MACOS
+    res._size = res._capacity;
+    _NSGetExecutablePath(res._data, &res._size);
 #endif
 
-#ifdef __linux
+#ifdef USTD_OS_LINUX
     res._size = ::readlink("/proc/self/exe", res._data, res.capacity);
 #endif
 
@@ -224,7 +224,7 @@ pub fn current_exe() noexcept -> Path {
 
 pub fn current_app() noexcept -> Path {
     let exe_path = current_exe();
-    let app_path = exe_path.parrent;
+    let app_path = exe_path.parent();
     return app_path;
 }
 
@@ -232,7 +232,7 @@ pub fn rename(Path src, Path dst) noexcept -> Result<none_t> {
     let path_src = src.get_fullpath();
     let path_dst = dst.get_fullpath();
 
-    let ret = ::rename(path_src.data, path_dst.data);
+    let ret = ::rename(path_src._data, path_dst._data);
     if (ret != 0) {
         let eid = os::get_error();
         log::error("ustd::fs::rename(src=`{}`, dst=`{}`): failed, error=`{}`", src, dst, eid);
@@ -247,7 +247,7 @@ pub fn create_dir(Path p) noexcept -> Result<none_t> {
     }
 
     let full_path   = p.get_fullpath();
-    let ret         = ::_mkdir(full_path.data, 0666);
+    let ret         = ::_mkdir(full_path._data, 0666);
     if (ret != 0) {
         let eid = os::get_error();
         log::error("ustd::fs::create_dir(path=`{}`): failed, error=`{}`", p, eid);
@@ -264,7 +264,7 @@ pub fn remove_dir(Path p) noexcept -> Result<none_t> {
     }
 
     let full_path   = p.get_fullpath();
-    let ret         = ::_rmdir(full_path.data);
+    let ret         = ::_rmdir(full_path._data);
     if (ret != 0) {
         let eid = os::get_error();
         log::error("ustd::fs::remove_dir(path=`{}`): failed, error=`{}`", p, eid);
@@ -281,7 +281,7 @@ pub fn remove_file(Path p) noexcept -> Result<none_t> {
     }
 
     let full_path   = p.get_fullpath();
-    let ret         = ::remove(full_path.data);
+    let ret         = ::remove(full_path._data);
     if (ret != 0) {
         let eid = os::get_error();
         log::error("ustd::fs::remove_file(path=`{}`): failed, error=`{}`", p, eid);

@@ -18,7 +18,7 @@ class NDArray : public NDSlice<T, N>
 
 public:
     explicit NDArray(dims_t dims): base(nullptr, dims) {
-        let cnt = base::get_count();
+        let cnt = base::count();
         let ptr = cuda::dnew<T>(cnt);
         if (ptr.is_ok()) {
             base::_data = ptr._ok;
@@ -29,7 +29,7 @@ public:
     {}
 
     explicit NDArray(math::NDSlice<T, N> src): NDArray(src.dims) {
-        let cnt = base::get_count();
+        let cnt = base::count();
         cuda::mcpy(base::_data, src._data, cnt);
     }
 
@@ -51,14 +51,14 @@ template<class T> using Arr3d = NDArray<T, 3>;
 
 template<typename T, u32 N>
 fn operator <<=(cuda::NDArray<T,N>& dst, math::NDArray<T,N>& src) -> cuda::NDArray<T, N>& {
-    let cnt = dst.count;
+    let cnt = dst.count();
     cuda::mcpy(dst._data, src._data, cnt);
     return dst;
 }
 
 template<typename T, u32 N>
 fn operator <<=(math::NDArray<T, N>& dst, cuda::NDArray<T, N>& src) -> math::NDArray<T, N>& {
-    let cnt = dst.count;
+    let cnt = dst.count();
     cuda::mcpy(dst._data, src._data, cnt);
     return dst;
 }

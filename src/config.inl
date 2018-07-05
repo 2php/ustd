@@ -27,6 +27,15 @@
 #   include <sys/ioctl.h>
 #endif
 
+// macos
+#if __has_include(<mach-o/dyld.h>)
+#   include <mach-o/dyld.h>
+#endif
+
+#if !defined(_WIN32) && __has_include(<pthread.h>)
+#   include <pthread.h>
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -60,8 +69,5 @@ using ustd::u16;  using ustd::i16;
 using ustd::u32;  using ustd::i32;
 using ustd::u64;  using ustd::i64;
 using ustd::f32;  using ustd::f64;
-
-using ustd::isize;
-using ustd::usize;
 
 #endif

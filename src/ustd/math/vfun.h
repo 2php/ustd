@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ustd/core.h"
+#include "ustd/math/ops.h"
 #include "ustd/math/ndslice.h"
 
 namespace ustd::math
@@ -14,8 +15,7 @@ struct Linspace
     T _step[N];
 
     // property[r]: dims
-    __declspec(property(get = get_dims)) u32 dims[];
-    fn get_dims(u32) const noexcept -> u32 {
+    fn dims(u32) const noexcept -> u32 {
         return u32(0);
     }
 
@@ -50,13 +50,12 @@ struct Parallel<F, T>
     {}
 
     // property[r]: dims
-    __declspec(property(get = get_dims)) u32 dims[];
-    fn get_dims(u32 i) const noexcept -> u32 {
+    fn dims(u32 i) const noexcept -> u32 {
         return _t.dims(i);
     }
 
     template<typename ...I>
-    __forceinline fn operator()(I ...idx) const noexcept {
+    fn operator()(I ...idx) const noexcept {
         return F::op(_t(idx...));
     }
 };
@@ -73,9 +72,8 @@ struct Parallel<F, A, B>
         static_assert(A::$rank == B::$rank || A::$rank == 0 || B::$rank == 0, "ustd::math::Parallel<A, B>: $rank not match");
     }
 
-    __declspec(property(get = get_dims)) u32 dims[];
-    fn get_dims(u32 i) const noexcept -> u32 {
-        return A::$rank == 0 ? _a.dims[i] : _b.dims[i];
+    fn dims(u32 i) const noexcept -> u32 {
+        return A::$rank == 0 ? _a.dims(i) : _b.dims(i);
     }
 
     template<typename ...I>
@@ -94,14 +92,13 @@ struct Reduce<F, V>
 
     V _t;
 
-    __declspec(property(get = get_dims)) u32 dims[];
-    fn get_dims(u32 i) const noexcept -> u32 {
-        return _t.dims[i + 1];
+    fn dims(u32 i) const noexcept -> u32 {
+        return _t.dims(i + 1);
     }
 
     template<typename ...I>
     fn operator()(I ...i) const noexcept {
-        let cnt = _t.dims[0];
+        let cnt = _t.dims(0);
         let f   = F();
 
         mut ret = f(_t(0, i...), _t(1, i...));
@@ -124,7 +121,7 @@ constexpr fn _is_ndslice(const void*) noexcept -> bool {
 }
 
 template<typename T>
-constexpr fn _to_ndview(const T& val) noexcept {
+constexpr fn _to_ndslice(const T& val) noexcept {
     if constexpr(_is_ndslice(declptr<T>())) {
         return NDSlice<typename T::type_t, T::$rank>(val);
     }
@@ -152,18 +149,18 @@ constexpr fn _get_rank_bop() -> u32 {
 }
 
 template<typename F, typename A>
-fn _make_parallel(const A& a) noexcept -> Parallel<F, decltype(_to_ndview(a))> {
-    return { _to_ndview(a) };
+fn _make_parallel(const A& a) noexcept -> Parallel<F, decltype(_to_ndslice(a))> {
+    return { _to_ndslice(a) };
 }
 
 template<typename F, typename A, typename B>
-fn _make_parallel(const A& a, const B& b) noexcept -> Parallel<F, decltype(_to_ndview(a)), decltype(_to_ndview(b)) > {
-    return { _to_ndview(a), _to_ndview(b) };
+fn _make_parallel(const A& a, const B& b) noexcept -> Parallel<F, decltype(_to_ndslice(a)), decltype(_to_ndslice(b)) > {
+    return { _to_ndslice(a), _to_ndslice(b) };
 }
 
 template<typename F, typename T>
-fn _make_reduce(const T& t) noexcept -> Reduce<F, decltype(_to_ndview(t)) > {
-    return { _to_ndview(t) };
+fn _make_reduce(const T& t) noexcept -> Reduce<F, decltype(_to_ndslice(t)) > {
+    return { _to_ndslice(t) };
 }
 #pragma endregion
 
@@ -194,5 +191,35 @@ template<class T> fn vatan(const T& t) noexcept { return _make_parallel<ops::ATa
 template<class T> fn vmax(const T& t) noexcept { return _make_reduce<ops::Max>(t); }
 template<class T> fn vmin(const T& t) noexcept { return _make_reduce<ops::Min>(t); }
 template<class T> fn vsum(const T& t) noexcept { return _make_reduce<ops::Add>(t); }
+
+template<class T, u32 N, class U>
+fn operator<<=(NDSlice<T, N>& dst, const U& src) noexcept -> NDSlice<T, N>& {
+    foreach<ops::SetTo>(dst, _to_ndslice(src));
+    return dst;
+}
+
+template<class T, u32 N, class U>
+fn operator+=(NDSlice<T, N>& dst, const U& src) -> NDSlice<T, N>& {
+    foreach<ops::AddTo>(dst, _to_ndslice(src));
+    return dst;
+}
+
+template<class T, u32 N, class U>
+fn operator-=(NDSlice<T, N>& dst, const U& src) -> NDSlice<T, N>& {
+    foreach<ops::SubTo>(dst, _to_ndslice(src));
+    return dst;
+}
+
+template<class T, u32 N, class U>
+fn operator*=(NDSlice<T, N>& dst, const U& src) -> NDSlice<T, N>& {
+    foreach<ops::MulTo>(dst, _to_ndslice(src));
+    return dst;
+}
+
+template<class T, u32 N, class U>
+fn operator/=(NDSlice<T, N>& dst, const U& src) -> NDSlice<T, N>& {
+    foreach<ops::DivTo>(dst, _to_ndslice(src));
+    return dst;
+}
 
 }

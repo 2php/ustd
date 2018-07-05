@@ -93,7 +93,7 @@ pub fn Dom::operator[](str name) noexcept -> Result<Dom> {
 
 pub fn Dom::arr_add_element(Dom& prev, Node value) noexcept -> Dom {
     let prev_idx = prev._index;
-    let node_idx = _nodes.len;
+    let node_idx = _nodes._size;
 
     _nodes[_index]._size += 1;
     _nodes.push(value);
@@ -109,7 +109,7 @@ pub fn Dom::obj_add_key_val(Dom& prev_key, Node key, Node val) noexcept -> Tuple
     let prev_key_idx = prev_key._index;
     let prev_val_idx = prev_key_idx + 1;
 
-    let key_idx = _nodes.len;
+    let key_idx = _nodes._size;
     let val_idx = key_idx + 1;
 
     _nodes[_index]._size += 1;
@@ -136,7 +136,7 @@ fn trait_sfmt_xml (Formatter& fmt, const Dom& dom) noexcept -> void;
 
 pub fn trait_sfmt(Formatter& fmt, const Dom& dom) noexcept -> void {
     let style = fmt._style;
-    let spec  = style.spec;
+    let spec  = style.spec();
 
     if (spec == str()) {
         trait_sfmt_json(fmt, dom);

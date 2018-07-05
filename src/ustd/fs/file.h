@@ -2,10 +2,15 @@
 
 #include "ustd/core.h"
 #include "ustd/fs/path.h"
-#include "ustd/os/posix.h"
+#include "ustd/os.h"
 
 namespace ustd::fs
 {
+
+using Error = os::Error;
+
+template<typename T>
+using Result = ustd::Result<T, os::Error>;
 
 enum class fid_t : i32
 {
@@ -30,6 +35,7 @@ enum class FileType
 };
 
 pub fn to_str(FileType type) noexcept -> str;
+
 
 class File
 {
@@ -76,8 +82,7 @@ public:
     pub fn is_valid() const noexcept;
 
     // property[r]: size
-    __declspec(property(get = get_size)) usize size;
-    pub fn get_size() const noexcept->usize;
+    pub fn size() const noexcept -> u64;
 
     // method: close
     pub fn close() noexcept -> void;

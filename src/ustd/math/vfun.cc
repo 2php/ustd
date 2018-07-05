@@ -6,14 +6,14 @@ namespace ustd::math
 unittest(vline)
 {
     mut a = NDArray<f32>({ 8 });
-    assert_eq(a.dims, { 8 });
+    assert_eq(a.dims(), { 8 });
     a <<= vline(1.0f);
-    for (u32 i = 0; i < a.dims[0]; ++i) {
+    for (u32 i = 0; i < a._dims[0]; ++i) {
         assert_eq(a(i), f32(i));
     }
 
     a <<= 2.f * a + 10;
-    for (u32 i = 0; i < a.dims[0]; ++i) {
+    for (u32 i = 0; i < a._dims[0]; ++i) {
         assert_eq(a(i), f32(i)*2.f + 10);
     }
 }
@@ -48,7 +48,7 @@ unittest(axpy)
     {
         y <<= 1.f;
         let t0 = time::Instant::now();
-        let ni = y.dims[0];
+        let ni = y._dims[0];
         for (mut k = 0u; k < loop; ++k) {
             for (u32 i = 0; i < ni; ++i) {
                 y(i) += a * x(i);

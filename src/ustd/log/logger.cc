@@ -56,7 +56,7 @@ pub Logger::~Logger() noexcept {
 }
 
 pub Logger::Logger(Logger&& other) noexcept
-    : _level(other.level)
+    : _level(other._level)
 {}
 
 // 64 KB

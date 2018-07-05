@@ -8,8 +8,8 @@ pub fn Thread::is_valid() const noexcept -> bool {
 }
 
 pub fn trait_sfmt(Formatter& fmt, const Thread& thr) noexcept -> void {
-    let name = thr.get_name();
-    let tid  = thr.get_id();
+    let name = thr.name();
+    let tid  = thr.id();
     fmt.write_fmt("{{name=`{}`, tid={}}}", name, tid);
 }
 

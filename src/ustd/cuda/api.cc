@@ -121,8 +121,8 @@ private:
         return cu_dev_name;
     }
 
-    fn get_device_mem() -> usize {
-        let cu_dev_mem_get = ffi::Fn<Error(size_t* bytes, dev_t id)>(get_fn("cuDeviceTotalMem_v2"));
+    fn get_device_mem() -> u64 {
+        let cu_dev_mem_get = ffi::Fn<Error(u64* bytes, dev_t id)>(get_fn("cuDeviceTotalMem_v2"));
 
         mut cu_dev_mem = u64(0);
         let cu_dev_name_eid = cu_dev_mem_get(&cu_dev_mem, _dev_id);
@@ -205,8 +205,8 @@ pub fn set_stream(stream_t stream) noexcept -> void {
 #pragma endregion
 
 #pragma region memory
-pub fn _dnew(Type type, usize count) noexcept -> Result<void*> {
-    static let cu_dev_malloc = get_fn<Error(void**, usize)>("cuMemAlloc_v2");
+pub fn _dnew(Type type, u64 count) noexcept -> Result<void*> {
+    static let cu_dev_malloc = get_fn<Error(void**, u64)>("cuMemAlloc_v2");
 
     if (count == 0u) {
         return Result<void*>::Ok(nullptr);
@@ -240,8 +240,8 @@ pub fn _ddel(Type type, void* ptr) noexcept -> Result<void> {
     return Result<void>::Ok();
 }
 
-pub fn _hnew(Type type, usize count) noexcept -> Result<void*> {
-    static let cu_host_malloc = get_fn<Error(void**, usize)>("cuMemAllocHost_v2");
+pub fn _hnew(Type type, u64 count) noexcept -> Result<void*> {
+    static let cu_host_malloc = get_fn<Error(void**, u64)>("cuMemAllocHost_v2");
 
     if (count == 0u) {
         return Result<void*>::Ok(nullptr);
@@ -274,8 +274,8 @@ pub fn _hdel(Type type, void* ptr) noexcept -> Result<void> {
     return Result<void>::Ok();
 }
 
-pub fn _mcpy(Type type, void* dst, const void* src, usize count) noexcept -> Result<void> {
-    static let cu_memcpy = get_fn<Error(void* dst, const void* src, usize size)>("cuMemcpy");
+pub fn _mcpy(Type type, void* dst, const void* src, u64 count) noexcept -> Result<void> {
+    static let cu_memcpy = get_fn<Error(void* dst, const void* src, u64 size)>("cuMemcpy");
 
     if (count == 0u) {
         return Result<void>::Ok();
@@ -317,9 +317,9 @@ enum class arr_flags_t: u32 {
 };
 
 struct arr_desc_t {
-    usize       width;
-    usize       height;
-    usize       depth;
+    u64       width;
+    u64       height;
+    u64       depth;
 
     arr_fmt_t   format;
     u32         num_channels;
@@ -419,33 +419,33 @@ pub fn _adel(Type type, arr_t arr) noexcept -> Result<void> {
 }
 
 struct mcpy_params_t {
-    usize       src_x           = 0;
-    usize       src_y           = 0;
-    usize       src_z           = 0;
-    usize       src_lod         = 0;
+    u64       src_x           = 0;
+    u64       src_y           = 0;
+    u64       src_z           = 0;
+    u64       src_lod         = 0;
     MemoryType  src_type        = MemoryType::Unified;
     const void* src_host        = nullptr;
     const void* src_device      = nullptr;
     arr_t       src_array       = arr_t(0);
     void*       src_reserved    = nullptr;
-    usize       src_pitch       = 0;
-    usize       src_height      = 0;
+    u64       src_pitch       = 0;
+    u64       src_height      = 0;
 
-    usize       dst_x           = 0;
-    usize       dst_y           = 0;
-    usize       dst_z           = 0;
-    usize       dst_lod         = 0;
+    u64       dst_x           = 0;
+    u64       dst_y           = 0;
+    u64       dst_z           = 0;
+    u64       dst_lod         = 0;
     MemoryType  dst_type        = MemoryType::Unified;
     const void* dst_host        = nullptr;
     const void* dst_device      = nullptr;
     arr_t       dst_array       = arr_t(0);
     void*       dst_reserved    = nullptr;
-    usize       dst_pitch       = 0;
-    usize       dst_height      = 0;
+    u64       dst_pitch       = 0;
+    u64       dst_height      = 0;
 
-    usize       width           = 0;
-    usize       height          = 0;
-    usize       depth           = 0;
+    u64       width           = 0;
+    u64       height          = 0;
+    u64       depth           = 0;
 };
 
 // ptr->arr
@@ -549,9 +549,9 @@ struct tex_desc_t {
 
 struct res_view_t {
     u32         format;
-    usize       width;
-    usize       height;
-    usize       depth;
+    u64       width;
+    u64       height;
+    u64       depth;
     u32         first_mipmap_level;
     u32         last_mipmap_level;
     u32         first_layer;

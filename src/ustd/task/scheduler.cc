@@ -26,7 +26,7 @@ pub fn Scheduler::run() noexcept -> void {
     while (true) {
         // get task
         let task_opt = [&]() -> Option<ITask&> {
-            mut lock = _mtx.lock();
+            mut lock = _mtx.lock().unwrap();
 
             while (!_tasks.is_empty()) {
                 for (mut& ptask : _tasks.into_iter()) {

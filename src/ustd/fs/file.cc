@@ -3,6 +3,14 @@
 namespace ustd::fs
 {
 
+#ifndef _UCRT
+#   define _open    open
+#   define _close   close
+#   define _read    read
+#   define _write   write
+#   define _lseek   lseek
+#endif
+
 #pragma region enums
 
 pub fn to_str(FileMode mode) noexcept->str {
@@ -49,7 +57,7 @@ pub File::File(Path path, Mode mode, Type type) noexcept: _fid(fid_t::Invalid) {
     ::_sopen_s(reinterpret_cast<int*>(&_fid), full_path, open_flag, share_flag, perm_flag);
 #else
     let perm_flag = 0644;
-    _fid = fid_t(::_open(full_path, open_flag, perm_flag));
+    _fid = fid_t(::open(full_path, open_flag, perm_flag));
 #endif
 
     if (_fid == fid_t::Invalid) return;
@@ -155,19 +163,32 @@ pub fn File::is_valid() const noexcept {
 }
 
 pub fn File::close() noexcept -> void {
-    if (_fid == fid_t::Invalid) return;
+    if (_fid == fid_t::Invalid) {
+        return;
+    }
+
     log::debug("ustd::fs::File[fid={}].close()", i32(_fid));
     ::_close(i32(_fid));
 }
 
-pub fn File::get_size() const noexcept -> usize {
-    if (_fid == fid_t::Invalid) return 0;
+pub fn File::size() const noexcept -> u64 {
+    if (_fid == fid_t::Invalid) {
+        return 0;
+    }
 
-    struct ::_stat64i32 st;
-    let eid = ::_fstat64i32(int(_fid), &st);
-    if (eid != 0) return 0;
+#ifdef _UCRT
+    struct ::_stat64 st;
+    let eid = ::_stat64(int(_fid), &st);
+#else
+    struct ::stat st;
+    let eid = ::fstat(int(_fid), &st);
+#endif
 
-    return usize(st.st_size);
+    if (eid != 0) {
+        return 0;
+    }
+
+    return u64(st.st_size);
 }
 
 pub fn File::seek(SeekFrom pos) noexcept -> Result<u64> {
@@ -176,15 +197,10 @@ pub fn File::seek(SeekFrom pos) noexcept -> Result<u64> {
         pos._pos == SeekFrom::End     ? SEEK_END :
         pos._pos == SeekFrom::Current ? SEEK_CUR : SEEK_SET;
 
-#ifdef _UCRT
     let res = ::_lseek(int(_fid), pos._pos, origin);
-#else
-    let res = ::lseek(int(_fid), pos._pos, origin);
-#endif
-
     if (res < 0 ) return Result<u64>::Err(os::get_error());
 
-    return Result<u64>::Ok(usize(res));
+    return Result<u64>::Ok(u64(res));
 }
 
 pub fn File::read(void* dat, u64 size) noexcept -> Result<u64> {
@@ -192,11 +208,7 @@ pub fn File::read(void* dat, u64 size) noexcept -> Result<u64> {
         return Result<u64>::Err(os::Error::InvalidData);
     }
 
-#ifdef _UCRT
     let ret = ::_read(int(_fid), dat, u32(size));
-#else
-    let ret = ::read(int(_fid), dat, size);
-#endif
 
     if (ret < 0)  return Result<u64>::Err(os::get_error());
     if (ret == 0) return Result<u64>::Err(os::Error::UnexpectedEof);
@@ -209,11 +221,7 @@ pub fn File::write(const void* dat, u64 size) noexcept -> Result<u64> {
         return Result<u64>::Err(os::Error::InvalidData);
     }
 
-#ifdef _UCRT
     let ret = ::_write(int(_fid), dat, u32(size));
-#else
-    let ret = ::write(int(_fid), dat, size);
-#endif
 
     if (ret <  0) return Result<u64>::Err(os::get_error());
     if (ret == 0) return Result<u64>::Err(os::Error::UnexpectedEof);
@@ -281,9 +289,9 @@ fn Stream::from_file(File& file) -> Stream {
 
 pub fn Stream::flush() noexcept -> Result<u64> {
     if (_file == nullptr)   return Result<u64>::Err(os::Error::InvalidData);
-    if (_wbuf.len == 0)     return Result<u64>::Ok(0u);
+    if (_wbuf._size == 0)     return Result<u64>::Ok(0u);
 
-    let res = _file->write(_wbuf.data, _wbuf.len);
+    let res = _file->write(_wbuf._data, _wbuf._size);
     _wbuf._size = 0;
     return res;
 }
@@ -293,12 +301,12 @@ pub fn Stream::write(const void* data, u64 size) noexcept -> Result<u64> {
     if (data == nullptr || size == 0)   return Result<u64>::Err(os::Error::InvalidInput);
 
     // flush
-    if (_wbuf.len + size > _wbuf.capacity) {
+    if (_wbuf._size + size > _wbuf._capacity) {
         flush();
     }
 
     // write dat to file
-    if (_wbuf.len == 0 && size > _wbuf.capacity) {
+    if (_wbuf._size == 0 && size > _wbuf._capacity) {
         return _file->write(data, size);
     }
 
@@ -321,7 +329,7 @@ pub fn Stream::read(void* data, u64 size) noexcept -> Result<u64> {
     // flush
     if (_rbuf._size != 0) {
         let cnt = ustd::min(rem_cnt, _rbuf._size);
-        mcpy(static_cast<u8*>(rem_dat), _rbuf.data, cnt);
+        mcpy(static_cast<u8*>(rem_dat), _rbuf._data, cnt);
         _rbuf._data += cnt;
         _rbuf._size -= cnt;
         _rbuf._capacity -= cnt;
@@ -345,7 +353,7 @@ pub fn Stream::read(void* data, u64 size) noexcept -> Result<u64> {
     // read from buf 
     // note: now _rbuf is empty
     if (_rbuf.is_empty()) {
-        let res = _file->read(_rbuf.data, _rbuf.capacity);
+        let res = _file->read(_rbuf._data, _rbuf._capacity);
         if (res.is_err()) return res;
         _rbuf._size = u32(res._ok);
     }
@@ -363,7 +371,7 @@ pub fn Stream::read_str(StrView& str) noexcept -> Result<u64> {
 pub fn Stream::read_str() noexcept -> Result<String> {
     if (_file->_fid == fid_t::Invalid) return Result<String>::Err(os::Error::InvalidData);
 
-    let file_size = _file->size;
+    let file_size = _file->size();
     if (file_size == 0) { return Result<String>::Ok(); }
 
     let cnt = u32(file_size + 3) / 4 * 4;
@@ -394,7 +402,7 @@ pub fn load_str(Path path) -> Result<String> {
     }
 
     mut& file     = file_opt._ok;
-    let  file_len = file.size;
+    let  file_len = file.size();
     mut  read_str = String::with_capacity(file_len);
 
     let  read_res = file.read(read_str._data, read_str._capacity);

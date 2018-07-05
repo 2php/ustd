@@ -13,12 +13,11 @@ struct Enum
 {
     T   _ok;
 
-    __declspec(property(get = get_name)) str name;
-    fn get_name() const noexcept -> str;
+    fn name() const noexcept -> str;
 };
 
 template<class T>
-inline fn Enum<T>::get_name() const noexcept -> str {
+inline fn Enum<T>::name() const noexcept -> str {
     let s = to_str(_ok);
     return s;
 }

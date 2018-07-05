@@ -3,13 +3,8 @@
 namespace ustd
 {
 
-pub fn panic(str msg) -> void {
+pub fn panic(const str& msg) -> void {
     log::error(msg);
-    throw PanicError();
-}
-
-pub fn panic(const char* msg) -> void {
-    log::error(cstr(msg));
     throw PanicError();
 }
 

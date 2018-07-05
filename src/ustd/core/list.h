@@ -232,10 +232,8 @@ public:
     }
 
 #pragma region property
-    // property[r]: capacity
-    __declspec(property(get = get_capacity)) u32 capacity;
-    fn get_capacity() const noexcept  -> u32 {
-        return _list.get_capacity();
+    fn capacity() const noexcept  -> u32 {
+        return _list.capacity();
     }
 
     fn is_empty() const noexcept -> bool {
@@ -391,19 +389,15 @@ public:
         return Queue(as_fwd<U>(u)...);
     }
 
-    // method: check if empty
     fn is_empty() const noexcept -> bool {
         return base::is_empty();
     }
 
-    // method: check if full
     fn is_full() const noexcept -> bool {
         return base::is_full();
     }
 
-    // property[r]: capacity
-    __declspec(property(get = get_capacity)) u32 capacity;
-    fn get_capacity() const noexcept  -> u32 {
+    fn capacity() const noexcept  -> u32 {
         return base::get_capacity();
     }
 
@@ -444,9 +438,8 @@ public:
         return base::is_full();
     }
 
-    template<typename ...U>
-    fn push(U&& ...u) noexcept -> Option<Stack&> {
-        return base::push_back(as_fwd<U>(u)...) & Option<Stack&>::Some(*this);
+    fn push(const T& val) noexcept -> Option<Stack&> {
+        return base::push_back(val) & Option<Stack&>::Some(*this);
     }
 
     fn pop() noexcept -> Option<T> {
@@ -484,14 +477,12 @@ public:
     }
 
     // property[r]: capacity
-    __declspec(property(get = get_capacity)) u32 capacity;
-    fn get_capacity() const noexcept  -> u32 {
-        return base::get_capacity();
+    fn capacity() const noexcept  -> u32 {
+        return base::capacity();
     }
 
-    template<typename ...U>
-    fn push(U&& ...u) noexcept -> void {
-        base::_push_back<base::Opt::OverWrite>(as_fwd<U>(u)...);
+    fn push(const T& val) noexcept -> void {
+        base::_push_back<base::Opt::OverWrite>(val);
     }
 
     fn pop() noexcept -> Option<T> {
@@ -545,9 +536,9 @@ public:
         return Option<const T&>(_list[0]);
     }
 
-    template<class ...U>
-    fn push(U&& ...u) noexcept -> Option<Heap&> {
-         mut res = _list.push(as_fwd<U>(u)...);
+    template<class U>
+    fn push(U&& u) noexcept -> Option<Heap&> {
+         mut res = _list.push(as_fwd<U>(u));
          if (res.is_none()) {
              return Option<Heap&>::None();
          }

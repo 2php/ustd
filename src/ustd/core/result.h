@@ -153,21 +153,21 @@ public:
 #pragma region except
     // method: except[move]
     template<typename ...U>
-    fn except(str fmt, const U& ...args) && -> ok_t {
+    fn except(const str& fmt, const U& ...args) && -> ok_t {
         if (is_err()) { ustd::panic(fmt, args...); }
         return static_cast<T&&>(_ok);
     }
 
     // method: except[cref]
     template<typename ...U>
-    fn except(str fmt, const U& ...args) const& -> cref_t<ok_t> {
+    fn except(const str& fmt, const U& ...args) const& -> cref_t<ok_t> {
         if (is_err()) { ustd::panic(fmt, args...); }
         return _ok;
     }
 
     // method: except[cref]
     template<typename ...U>
-    fn except(str fmt, const U& ...args) & -> ref_t<ok_t> {
+    fn except(const str& fmt, const U& ...args) & -> ref_t<ok_t> {
         if (is_err()) { ustd::panic(fmt, args...); }
         return _ok;
     }
@@ -320,15 +320,15 @@ public:
     {}
 
     ~Result() {
-        if (!_valid) _err.~E();
+        if (!_valid) ustd::dtor(&_err);
     }
 
     Result(Result&& other) : _valid(other._valid), _ok(other._ok) {
-        if (!_valid) new(&_err)(as_mov(other._err));
+        if (!_valid) ustd::ctor(&_err, as_mov(other._err));
     }
 
     Result(const Result& other) : _valid(other._valid), _ok(other._ok) {
-        if (!_valid) new(&_err)(other._err);
+        if (!_valid) ustd::ctor(&_err, as_mov(other._err));
     }
 
     // ctor: ok

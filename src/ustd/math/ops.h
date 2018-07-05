@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ustd/core.h"
+#include "ustd/core/ops.h"
 
 namespace ustd::math
 {
@@ -67,7 +68,8 @@ struct Pow   { template<class A, class B> fn operator()(A a, B b) noexcept { ret
 
 template<u32 ...I, class T, u32 N>
 fn idx_norm(immut_t<u32, I...>, vec<T, N> v) noexcept -> T {
-    return math::sqrt(... +(v[I]*v[I]));
+    let norm2_val = ustd::sum((v[I]*v[I])...);
+    return math::sqrt(norm2_val);
 }
 
 template<class T, u32 N>

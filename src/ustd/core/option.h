@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ustd/core/builtin.h"
+#include "ustd/core/panic.h"
 
 namespace ustd
 {
@@ -9,6 +10,11 @@ template<typename T>
 struct Slice;
 
 using str = Slice<const char>;
+
+struct Type;
+
+template<class T>
+fn typeof() noexcept -> Type;
 
 // option: val
 template<typename T>

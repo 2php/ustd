@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ustd/core/builtin.h"
+#include "ustd/core/option.h"
 
 namespace ustd
 {
@@ -12,6 +13,9 @@ template<typename T>
 struct Slice;
 
 using str = Slice<const char>;
+
+template<class T>
+fn mcpy(T* dst, const T* src, u64 size) -> void;
 
 template<typename T>
 struct Slice
@@ -51,30 +55,30 @@ struct Slice
 #pragma endregion
 
 #pragma region property
-    // property[r]: data
-    __declspec(property(get = get_data)) type_t* data;
-    fn get_data() const noexcept -> type_t* {
+    fn data() const noexcept -> type_t* {
         return _data;
     }
 
-    // property[r]: len
-    __declspec(property(get = get_len)) size_t len;
-    fn get_len() const noexcept -> size_t {
+    fn len() const noexcept -> size_t {
         return _size;
     }
 
-    // property[r]: capacity
-    __declspec(property(get = get_capacity)) size_t capacity;
-    fn get_capacity() const noexcept -> size_t {
+    fn size() const noexcept -> size_t {
+        return _size;
+    }
+
+    fn count() const noexcept -> size_t {
+        return _size;
+    }
+
+    fn capacity() const noexcept -> size_t {
         return _capacity;
     }
 
-    // property[r]: is_empty 
     fn is_empty() const noexcept -> bool {
         return _size == 0;
     }
 
-    // property[r]: is_full
     fn is_full() const noexcept -> bool {
         return _size == _capacity;
     }
@@ -150,10 +154,7 @@ struct Slice
     }
 
     // method: ends_with
-    template<class U>
-    fn ends_with(Slice<U> suffix) const noexcept -> bool {
-        static_assert($is<ustd::const_t<U>, const_t>);
-
+    fn ends_with(Slice<const T> suffix) const noexcept -> bool {
         if (suffix._size > _size) {
             return false;
         }
@@ -164,10 +165,9 @@ struct Slice
     }
 
     // method: contains
-    template<class U>
-    fn contains(U&& item) const noexcept -> bool {
+    fn contains(const T& val) const noexcept -> bool {
         for (mut i = 0u; i < _size; ++i) {
-            if (_data[i] == item) {
+            if (_data[i] == val) {
                 return true;
             }
         }

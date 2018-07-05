@@ -17,7 +17,7 @@ static fn _get_builtin_names(Type type) noexcept -> str {
     return "";
 }
 
-pub fn Type::get_fullname() const noexcept -> str {
+pub fn Type::fullname() const noexcept -> str {
     if (_type != '?' && _size <= 8){
         let res = _get_builtin_names(*this);
         return res;
@@ -25,17 +25,17 @@ pub fn Type::get_fullname() const noexcept -> str {
 
     let prefix_len = u32(sizeof("ustd::str ustd::typeof() [T = "));
     let suffix_len = u32(sizeof("]") - 1);
-    let res        = str(_desc._data + prefix_len, _desc.len - prefix_len - suffix_len);
+    let res        = str(_desc._data + prefix_len, _desc._size - prefix_len - suffix_len);
     return res;
 }
 
-pub fn Type::get_name() const noexcept -> str {
+pub fn Type::name() const noexcept -> str {
     if (_type != '?' && _size <= 8) {
         let res = _get_builtin_names(*this);
         return res;
     }
 
-    let name = get_fullname();
+    let name = fullname();
     let idx_opt = name.rfind(':');
     if (idx_opt.is_none()) {
         return name;
@@ -46,8 +46,8 @@ pub fn Type::get_name() const noexcept -> str {
     return res;
 }
 
-pub fn Type::get_mod() const noexcept -> str {
-    let name = get_fullname();
+pub fn Type::mod() const noexcept -> str {
+    let name = fullname();
     let idx_opt = name.rfind(':');
     if (idx_opt.is_none() || idx_opt._val <= 1) return {};
 
@@ -57,12 +57,12 @@ pub fn Type::get_mod() const noexcept -> str {
 }
 
 pub fn Type::to_str() const noexcept -> str {
-    let res = get_fullname();
+    let res = fullname();
     return res;
 }
 
 pub fn trait_sfmt(Formatter& fmt, const Type& type) noexcept -> void {
-    let s = type.name;
+    let s = type.name();
     fmt(s);
 }
 

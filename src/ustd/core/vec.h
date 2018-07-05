@@ -178,21 +178,26 @@ fn operator*(const T& k, const vec<T, N>& x) noexcept -> vec<T, N> {
 #pragma endregion
 
 #pragma region norm
+template<u32 ...I, class T, u32 N>
+fn _vnorm2(immut_t<u32, I...>, const vec<T, N>& x) noexcept -> vec<T, N>{
+    return (... + (x._arr[I]*x._arr[I]));
+}
+
 template<typename T, u32 N>
 fn vnorm(const vec<T,N>& x) noexcept -> T {
-    return 
+    return sqrt(_vnorm2(seq_t<N>{}, x));
 }
 #pragma endregion
 
 #pragma region round
 template<u32 ...I, u32 N>
 fn _vround(immut_t<u32, I...>, const vec<f32, N>& x) noexcept -> vec<i32, N> {
-    return vec<T, N>(i32(__builtin_roundf(x._arr[I]))...);
+    return vec<f32, N>(i32(__builtin_roundf(x._arr[I]))...);
 }
 
 template<u32 ...I, u32 N>
 fn _vround(immut_t<u32, I...>, const vec<f64, N>& x) noexcept -> vec<i32, N> {
-    return vec<T, N>(i32(__builtin_round(x._arr[I]))...);
+    return vec<f64, N>(i32(__builtin_round(x._arr[I]))...);
 }
 
 template<typename T, u32 N>

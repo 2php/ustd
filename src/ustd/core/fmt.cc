@@ -17,7 +17,7 @@ static void _sfmt_str(const Formatter& fmt, str s) noexcept {
     let style_s   = fmt._style._type == 's';
     let num_chars = s._size + (style_s ? 2u : 0u);
 
-    mut p = outbuf.data + outbuf.len;
+    mut p = outbuf._data + outbuf._size;
     if (style._width <= num_chars) {
         outbuf._size += num_chars;
 
@@ -128,7 +128,7 @@ inline fn _count_digits(u8 n) -> u32 {
 
 static fn _sfmt_int_box(const Formatter& fmt, const char prefix[], u32 num_prefix, u32 num_digits) noexcept -> char* {
     let style = fmt._style;
-    let s = fmt._outbuf.data + fmt._outbuf.len;
+    let s = fmt._outbuf._data + fmt._outbuf._size;
     
     // check: res.width is small
     if (fmt._style._width < num_digits + num_prefix) {
@@ -336,7 +336,7 @@ static fn _sfmt_float(const Formatter& fmt, f64 value) noexcept -> void {
 
     char tmp_buf[256];
 
-    let p = style._width == 0 ? (fmt._outbuf.data + fmt._outbuf.len) : tmp_buf;
+    let p = style._width == 0 ? (fmt._outbuf._data + fmt._outbuf._size) : tmp_buf;
     mut num_digits = 0u;
 
     if (value < 0) {
@@ -431,8 +431,8 @@ pub fn _sformat_parse(StrView& outbuf, str& fmtstrs, str *fmtstr, i32* idx) noex
     //       ^        ^    ^
     //       p        q    e
 
-    let s = fmtstrs.data;
-    let e = s + fmtstrs.len;
+    let s = fmtstrs._data;
+    let e = s + fmtstrs._size;
     mut p = s;
 
     // find: p
@@ -490,11 +490,11 @@ pub fn FmtStyle::from_str(str text) noexcept -> FmtStyle {
     mut res = FmtStyle{};
     res._fill = ' ';
 
-    if (text.len == 0) {
+    if (text._size == 0) {
         return res;
     }
 
-    mut p = text.data;
+    mut p = text._data;
 
     // [[fill]align]
     if (p[1] == '>' || p[1] == '<' || p[1] == '^') {

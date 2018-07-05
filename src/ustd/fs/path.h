@@ -1,9 +1,12 @@
 #pragma once
 
 #include "ustd/core.h"
+#include "ustd/os.h"
 
 namespace ustd::fs
 {
+
+using Error = os::Error;
 
 template<typename T>
 using Result = ustd::Result<T, os::Error>;
@@ -22,17 +25,14 @@ struct Path: str
     constexpr Path(const char(&s)[N]) noexcept: base(s)
     {}
 
-    // property[r]: parrent
-    __declspec(property(get = get_parent)) Path parrent;
-    pub fn get_parent() const noexcept->Path;
+    // property[r]: parent
+    pub fn parent() const noexcept->Path;
 
     // property[r]: file_name
-    __declspec(property(get = get_file_name)) Path file_name;
-    pub fn get_file_name() const noexcept->Path;
+    pub fn file_name() const noexcept->Path;
 
     // property[r]: extension
-    __declspec(property(get = get_extension)) Path extension;
-    pub fn get_extension() const noexcept->Path;
+    pub fn extension() const noexcept->Path;
 
     // method: check if is file
     pub fn is_file() const noexcept -> bool;

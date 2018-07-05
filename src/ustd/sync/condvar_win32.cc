@@ -1,14 +1,5 @@
 #include "config.inl"
 
-#if __has_include(<pthread.h>)
-#   define USTD_SYNC_PTHREAD
-#   include <pthread.h>
-#elif defined(_WIN32)
-#   define USTD_SYNC_WIN32
-#endif
-
-
-#ifdef USTD_SYNC_WIN32
 using ustd::sync::condvar_t;
 using ustd::sync::mtx_t;
 
@@ -101,5 +92,3 @@ pub fn CondVar::to_str() const noexcept -> FixedStr<32> {
 }
 
 }
-
-#endif

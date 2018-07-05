@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ustd/core/str.h"
 #include "ustd/core/panic.h"
 #include "ustd/core/vec.h"
 #include "ustd/core/tuple.h"
@@ -20,9 +21,8 @@ struct FmtStyle
     u8  _spec_len   = 0;    // [0~11]
     i8  _spec[9];           // [...]
 
-    __declspec(property(get = get_spec)) str spec;
-    fn get_spec() const noexcept -> str {
-        return str(_spec, _spec_len);
+    fn spec() const noexcept -> str {
+        return str(reinterpret_cast<const char*>(_spec), _spec_len);
     }
 
     static pub fn from_str(str s) noexcept -> FmtStyle;
@@ -82,8 +82,8 @@ private:
     }
 
     template<u32 N>
-    fn do_fmt(const char(&s)[N], ver_t<4>) -> void {
-        let s = str(s);
+    fn do_fmt(const char(&val)[N], ver_t<4>) -> void {
+        let s = str(val);
         do_fmt_val(s);
     }
 
@@ -163,8 +163,10 @@ private:
     pub fn do_fmt_val(u32         val) noexcept -> void;
     pub fn do_fmt_val(i64         val) noexcept -> void;
     pub fn do_fmt_val(u64         val) noexcept -> void;
+
     pub fn do_fmt_val(f32         val) noexcept -> void;
     pub fn do_fmt_val(f64         val) noexcept -> void;
+
     pub fn do_fmt_val(bool        val) noexcept -> void;
     pub fn do_fmt_val(str         val) noexcept -> void;
     pub fn do_fmt_val(const void* val) noexcept -> void;
@@ -192,7 +194,7 @@ private:
     template<class T>
     fn do_fmt_arr(const T& arr) noexcept -> void {
         let max_len     = 8;
-        let use_indent  = arr.len > max_len;
+        let use_indent  = arr.len() > max_len;
 
         push_str("[");
 
@@ -201,7 +203,7 @@ private:
             indent(+1);
         }
 
-        for (mut i = 0u; i < arr.len; ++i) {
+        for (mut i = 0u; i < arr._size; ++i) {
             do_fmt_arr_element(i, arr, use_indent);
         }
         if (use_indent) indent(-1);
@@ -264,7 +266,7 @@ private:
     fn do_fmt_arr_element(u32 idx, const T& arr, bool use_indent) -> void {
         using E         = val_t<decltype(arr[0])>;
         let max_len     = 8;
-        let is_last     = idx + 1 == arr.len;
+        let is_last     = idx + 1 == arr._size;
 
         if (use_indent && idx != 0) {
             if ( (!trait<E>::$num) || (idx % max_len == 0)) {
@@ -337,7 +339,7 @@ fn sformat(StrView& outbuf, str fmt, const T& ...args) noexcept -> StrView {
 }
 
 template<u32 N, typename ...T>
-fn snformat(str fmt, const T& ...args) noexcept -> FixedStr<N> {
+fn snformat(const str& fmt, const T& ...args) noexcept -> FixedStr<N> {
     FixedStr<N> outbuf;
     ustd::sformat(outbuf, fmt, args...);
     return as_mov(outbuf);
@@ -350,7 +352,7 @@ fn println(const str& fmt, const T& t, const U& ...u) noexcept -> void {
 }
 
 template<typename T, class ...U>
-fn panic(str fmt, const T& t, const U& ...u) -> void {
+fn panic(const str& fmt, const T& t, const U& ...u) -> void {
     let outstr = snformat<4*1024>(fmt, t, u...);
     ustd::panic(outstr);
 }

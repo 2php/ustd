@@ -14,7 +14,7 @@ class NDArray : public NDSlice<T, N>
 
 public:
     NDArray(const dims_t& dims) noexcept : base(nullptr, dims) {
-        usize dims_arr[N];
+        u64 dims_arr[N];
         for(mut i = 0u; i < N; ++i) {
             dims_arr[i] = dims[i];
         }
@@ -44,7 +44,5 @@ public:
     {}
 };
 
-template<typename T>
-using Scalar = NDArray<T, 0>;
-
 }
+

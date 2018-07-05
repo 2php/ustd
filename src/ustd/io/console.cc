@@ -131,7 +131,7 @@ pub fn to_str(SGR code) noexcept -> str {
 #pragma region console
 
 pub fn Console::write_str(str s) const noexcept -> u32 {
-    return ::_write_console(int(_fid), s.data, s.len);
+    return ::_write_console(int(_fid), s._data, s._size);
 }
 
 pub fn Console::is_tty() const noexcept -> bool {
@@ -159,7 +159,7 @@ pub fn Console::get_columns() const noexcept-> u32 {
 #pragma region ConsoleLockGuard
 pub fn ConsoleLockGuard::lock() -> sync::MutexGuard {
     static sync::Mutex mtx;
-    return mtx.lock();
+    return mtx.lock().unwrap();
 }
 #pragma endregion
 

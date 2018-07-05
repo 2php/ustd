@@ -202,7 +202,7 @@ private:
             let enum_val = T(i);
             let enum_name = to_str(enum_val);
             if (enum_name == str()) break;
-            if (enum_name == res) {
+            if (enum_name == str_val) {
                 return Result<T>::Ok(enum_val);
             }
         }
@@ -320,7 +320,7 @@ public:
     }
 
     static fn from_json(str text) noexcept -> ustd::Result<Tree, str> {
-        mut tree = Tree(text.len / 16 + 256);
+        mut tree = Tree(text.len() / 16 + 256);
 
         let res = tree._parse_json(text);
         return res.map([&]() { return as_mov(tree); });

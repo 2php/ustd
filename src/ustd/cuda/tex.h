@@ -22,7 +22,7 @@ public:
     }
 
     explicit Tex(const u32(&dim)[N], TexAddress border_mode, TexFilter filter_mode = TexFilter::Point)
-        : Tex(dim_t(dims), border_mode, filter_mode)
+        : Tex(dim_t(dim), border_mode, filter_mode)
     {}
 
     explicit Tex(math::NDSlice<T,N> src): Tex(src.dims) {

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ustd/core/builtin.h"
+#include "ustd/core.h"
 
 namespace ustd::math
 {
@@ -29,6 +29,7 @@ template<typename T, u32 N>
 struct NDSlice
 {
     using type_t  = T;
+    using size_t  = u32;
     using idxs_t  = vec<i32, N>;
     using dims_t  = vec<u32, N>;
 
@@ -67,32 +68,32 @@ struct NDSlice
 
 #pragma region property
     // property[r]: data
-    __declspec(property(get = get_data)) T* data;
-    fn get_data() noexcept -> T* {
+    fn data() noexcept -> T* {
         return _data;
     }
 
     // property[r]: rank
-    __declspec(property(get = get_rank)) size_t rank;
-    fn get_rank() noexcept -> size_t {
+    fn rank() noexcept -> size_t {
         return N;
     }
 
     // property[r]: dims
-    __declspec(property(get = get_dims)) dims_t dims;
-    fn get_dims() const noexcept -> const dims_t&{
+    fn dims() const noexcept -> const dims_t&{
         return _dims;
     }
 
+    // property[r]: dims
+    fn dims(u32 idx) const noexcept -> size_t {
+        return idx < N ? _dims[idx] : 0;
+    }
+
     // property[r]: step
-    __declspec(property(get = get_step)) idxs_t step;
-    fn get_step() const noexcept -> const idxs_t& {
+    fn step() const noexcept -> const idxs_t& {
         return _step;
     }
 
     // property[r]: count
-    __declspec(property(get = get_count)) size_t count;
-    fn get_count() const noexcept -> size_t {
+    fn count() const noexcept -> size_t {
         return idx_reduce<ops::Mul>(seq_t<N>{}, _dims);
     }
 
@@ -216,28 +217,30 @@ struct NDSlice<T, 0>
     {}
 
     // property[r]: dims
-    __declspec(property(get = get_dims)) u32 dims[];
-    fn get_dims(u32) const noexcept -> u32 {
+    fn dims(u32) const noexcept -> u32 {
         return 0;
     }
 
     // operator: ()
     template<typename ...I>
-    __forceinline fn operator()(I ...) const noexcept -> const type_t& {
+    fn operator()(I ...) const noexcept -> const type_t& {
         return _val;
     }
 
     // operator: ()
     template<typename ...I>
-    __forceinline fn operator()(I ...) noexcept  -> type_t& {
+    fn operator()(I ...) noexcept  -> type_t& {
         return _val;
     }
 };
 
+template<class T>
+using Scalar = NDSlice<T,0>;
+
 template<class T, u32 N>
 void sfmt(Formatter& fmt, const NDSlice<T, N>& v) {
     if constexpr(N == 0) {
-        fmt();
+        fmt.push_str("[]");
     }
     if constexpr(N == 1) {
         let  nx = v.dims[0];
@@ -308,34 +311,5 @@ void foreach(Y& y, const X& x) {
     }
 }
 
-template<class T, u32 N, class U>
-fn operator<<=(NDSlice<T, N>& dst, const U& src) noexcept -> NDSlice<T, N>& {
-    foreach<ops::SetTo>(dst, _to_ndview(src));
-    return dst;
-}
-
-template<class T, u32 N, class U>
-fn operator+=(NDSlice<T, N>& dst, const U& src) -> NDSlice<T, N>& {
-    foreach<ops::AddTo>(dst, _to_ndview(src));
-    return dst;
-}
-
-template<class T, u32 N, class U>
-fn operator-=(NDSlice<T, N>& dst, const U& src) -> NDSlice<T, N>& {
-    foreach<ops::SubTo>(dst, _to_ndview(src));
-    return dst;
-}
-
-template<class T, u32 N, class U>
-fn operator*=(NDSlice<T, N>& dst, const U& src) -> NDSlice<T, N>& {
-    foreach<ops::MulTo>(dst, _to_ndview(src));
-    return dst;
-}
-
-template<class T, u32 N, class U>
-fn operator/=(NDSlice<T, N>& dst, const U& src) -> NDSlice<T, N>& {
-    foreach<ops::DivTo>(dst, _to_ndview(src));
-    return dst;
-}
 
 }

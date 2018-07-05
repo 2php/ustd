@@ -1,5 +1,7 @@
 #pragma once
 
+#include "ustd/core/builtin.h"
+
 namespace ustd::sync
 {
 
@@ -21,26 +23,26 @@ fn compare_and_swap(T* target, T expect, T value) noexcept -> bool {
 template<class T>
 struct Atomic
 {
-    T _ok;
+    T _val;
 
     operator T&() noexcept {
-        return _ok;
+        return _val;
     }
 
     operator const T&() const noexcept {
-        return _ok;
+        return _val;
     }
 
-    __forceinline fn operator+=(T val) noexcept -> T {
-        return sync::fetch_and_add(&_ok, val);
+    fn operator+=(T val) noexcept -> T {
+        return sync::fetch_and_add(&_val, val);
     }
 
-    __forceinline fn operator-=(T val) noexcept -> T {
-        return sync::sync_fetch_and_sub(&_dat, val);
+    fn operator-=(T val) noexcept -> T {
+        return sync::fetch_and_sub(&_val, val);
     }
 
-    __forceinline fn compare_and_swap(T expect, T newval) -> bool {
-        sync::compare_and_swap(&_dat, expect, newval);
+    fn compare_and_swap(T old_val, T new_val) -> bool {
+        sync::compare_and_swap(&_val, old_val, new_val);
     }
 
 };

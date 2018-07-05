@@ -23,8 +23,8 @@ struct FixedStr : public StrView
         base::push_slice(s);
     }
 
-    template<u32 N>
-    FixedStr(const char(&s)[N]) noexcept : FixedStr(str(s)) {
+    template<u32 M>
+    FixedStr(const char(&s)[M]) noexcept : FixedStr(str(s)) {
     }
 
     FixedStr(const FixedStr& other) noexcept: FixedStr(str(other)) {
@@ -46,8 +46,8 @@ struct FixedCStr : public FixedStr<N - 1>
         _data[_size] = '\0';                       
     }
 
-    template<u32 N>
-    FixedCStr(const char(&s)[N]): FixedCStr(str(s)) {
+    template<u32 M>
+    FixedCStr(const char(&s)[M]): FixedCStr(str(s)) {
     }
 
     FixedCStr(const FixedCStr& other) noexcept: FixedCStr(str(other)) {

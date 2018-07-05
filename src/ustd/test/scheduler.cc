@@ -14,7 +14,7 @@ enum State
 };
 
 static fn match(str name, Slice<str> patterns) noexcept -> bool {
-    if (patterns.len == 0) {
+    if (patterns.len() == 0) {
         return true;
     }
 
@@ -76,7 +76,7 @@ pub fn Pipeline::invoke(Slice<str> pattern) noexcept -> u32 {
     mut cnt = 0u;
 
     for(mut test: tests.into_iter()) {
-        let  name = snformat<256>("{}::{}", test.type.mod, test.name);
+        let  name = snformat<256>("{}::{}", test.type.mod(), test.name);
 
         if (!match(name, pattern)) {
             on(name, Ignore);

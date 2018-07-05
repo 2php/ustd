@@ -11,8 +11,8 @@ class  Mod;
 template<class F>
 struct Fn;
 
-enum mod_t : usize { };
-enum fun_t : usize { };
+enum mod_t : u64 { };
+enum fun_t : u64 { };
 
 class Mod final
 {

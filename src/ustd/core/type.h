@@ -12,16 +12,10 @@ struct Type
     u16  _size;
     str  _desc;
 
-    __declspec(property(get = get_fullname)) str fullname;
-    pub fn get_fullname() const noexcept->str;
-
-    __declspec(property(get = get_name)) str name;
-    pub fn get_name() const noexcept->str;
-
-    __declspec(property(get = get_mod)) str mod;
-    pub fn get_mod() const noexcept->str;
-
-    pub fn to_str() const noexcept->str;
+    pub fn fullname()   const noexcept->str;
+    pub fn name()       const noexcept->str;
+    pub fn mod()        const noexcept->str;
+    pub fn to_str()     const noexcept->str;
 };
 
 class Formatter;

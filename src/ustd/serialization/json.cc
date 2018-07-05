@@ -25,7 +25,7 @@ private:
         // .....#####
         //      ^
         //     pos
-        let cnt = u32(_text.len);
+        let cnt = _text._size;
         mut pos = 0u;
 
         while (true) {

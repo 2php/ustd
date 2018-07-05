@@ -1,5 +1,7 @@
 #pragma once
 
+#include "ustd/core.h"
+
 namespace ustd::cuda
 {
 
@@ -33,23 +35,23 @@ enum class TexFilter {
 };
 
 #pragma region detail
-pub fn _dnew(Type type, usize cnt) noexcept                                                            -> Result<void*>;
-pub fn _ddel(Type type, void* ptr) noexcept                                                            -> Result<void>;
+pub fn _dnew(Type type, u64  cnt) noexcept                                                 -> Result<void*>;
+pub fn _ddel(Type type, void* ptr) noexcept                                                -> Result<void>;
 
-pub fn _hnew(Type type, usize cnt) noexcept                                                            -> Result<void*>;
-pub fn _hdel(Type type, void* ptr) noexcept                                                            -> Result<void>;
+pub fn _hnew(Type type, u64   cnt) noexcept                                                -> Result<void*>;
+pub fn _hdel(Type type, void* ptr) noexcept                                                -> Result<void>;
 
-pub fn _mcpy(Type type, void* dst, const void* src, usize count) noexcept                               -> Result<void>;
+pub fn _mcpy(Type type, void* dst, const void* src, u64   count) noexcept                  -> Result<void>;
 
-pub fn _anew(Type type, u32 rank, const u32 dims[]) noexcept                                -> Result<arr_t>;
-pub fn _adel(Type type, arr_t arr) noexcept                                                            -> Result<void>;
-pub fn _acpy(Type type, arr_t dst, const void* src, u32 rank, const u32 dims[]) noexcept    -> Result<void>;
-pub fn _acpy(Type type, void* dst, arr_t       src, u32 rank, const u32 dims[]) noexcept    -> Result<void>;
+pub fn _anew(Type type, u32 rank, const u32 dims[]) noexcept                               -> Result<arr_t>;
+pub fn _adel(Type type, arr_t arr) noexcept                                                -> Result<void>;
+pub fn _acpy(Type type, arr_t dst, const void* src, u32 rank, const u32 dims[]) noexcept   -> Result<void>;
+pub fn _acpy(Type type, void* dst, arr_t       src, u32 rank, const u32 dims[]) noexcept   -> Result<void>;
 
-pub fn _tnew(Type type, arr_t arr, TexAddress addr, TexFilter filter) noexcept                         -> Result<tex_t>;
-pub fn _tdel(Type type, tex_t tex) noexcept                                                            -> Result<void>;
+pub fn _tnew(Type type, arr_t arr, TexAddress addr, TexFilter filter) noexcept             -> Result<tex_t>;
+pub fn _tdel(Type type, tex_t tex) noexcept                                                -> Result<void>;
 
-pub fn _sync() noexcept                                                                     -> Result<void>;
+pub fn _sync() noexcept                                                                    -> Result<void>;
 #pragma endregion
 
 #pragma region context
@@ -62,7 +64,7 @@ inline fn sync() noexcept -> Result<void> {
 
 #pragma region memory
 template<class T>
-fn dnew(usize cnt) noexcept -> Result<T*> {
+fn dnew(u64 cnt) noexcept -> Result<T*> {
     mut res = _dnew(typeof<T>(), cnt);
     return res.map([](void* ptr) { 
         return static_cast<T*>(ptr);
@@ -75,9 +77,9 @@ fn ddel(T* ptr) noexcept -> void {
 }
 
 template<class T>
-fn hnew(usize cnt) noexcept -> Result<T*> {
+fn hnew(u64 cnt) noexcept -> Result<T*> {
     mut res = _hnew(typeof<T>(), cnt);
-    return res.map([](void* ptr) { return static_cast<T*>(ptr); })
+    return res.map([](void* ptr) { return static_cast<T*>(ptr); });
 }
 
 template<class T>
@@ -86,7 +88,7 @@ fn hdel(T* ptr) noexcept -> void {
 }
 
 template<class T>
-fn mcpy(T* dst, const T* src, usize cnt) noexcept -> void {
+fn mcpy(T* dst, const T* src, u64 cnt) noexcept -> void {
     cuda::_mcpy(typeof<T>(), dst, src, cnt);
 }
 

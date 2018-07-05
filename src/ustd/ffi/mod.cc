@@ -44,9 +44,10 @@ static fn get_mod_path(str name) noexcept -> fs::FixedPath<> {
     let res = fs::FixedPath<>::from_fmt("{}.dll", name);
 #elif defined(USTD_OS_LINUX)
     let res = fs::FixedPath<>::from_fmt("lib{}.so", name);
-#elif
-    let res = fs::FixedPath<>(name);
+#elif defined(USTD_OS_MACOS)
+    let res = fs::FixedPath<>::from_fmt("lib{}.dylib", name);
 #endif
+
     return res;
 }
 
@@ -54,7 +55,7 @@ pub Mod::Mod(str name) noexcept {
     let path        = get_mod_path(name);
     let full_path   = path.get_fullpath();
 
-    _mod = mod_t(reinterpret_cast<usize>(::dlopen(full_path.data, RTLD_LAZY)));
+    _mod = mod_t(reinterpret_cast<u64>(::dlopen(full_path._data, RTLD_LAZY)));
     if (_mod == mod_t(0)) {
         log::error("ustd::ffi::Mod[{}].ctor(name={}): cannot load library.", this, name);
         return;
@@ -84,7 +85,7 @@ pub Mod::~Mod() noexcept  {
         log::info("ustd::ffi::Mod[{}].ctor(): call `mod_exit` ok.", this);
     }
 
-    ::dlclose(reinterpret_cast<void*>(usize(_mod)));
+    ::dlclose(reinterpret_cast<void*>(u64(_mod)));
     log::info("ustd::ffi::Mod[{}].dtor(): success", this);
 }
 
@@ -95,7 +96,7 @@ pub fn Mod::get_fn(str name, bool show_log) const noexcept -> Option<fun_t> {
 
     let cname = FixedCStr<256>(name);
 
-    let res  = fun_t(usize(::dlsym(reinterpret_cast<void*>(usize(_mod)), cname)));
+    let res  = fun_t(u64(::dlsym(reinterpret_cast<void*>(u64(_mod)), cname)));
     if (res == fun_t(0)) { 
         if (show_log) {
             log::error("ustd::ffi::Mod[{}].[name={}]: cannot find function", this, name);

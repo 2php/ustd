@@ -1,15 +1,15 @@
 #include "config.inl"
 
 #ifdef __INTELLISENSE__
-fn __builtin_operator_new   (usize size)  -> void*;
+fn __builtin_operator_new   (u64 size)  -> void*;
 fn __builtin_operator_delete(void* ptr)   -> void;
 #endif
 
 namespace ustd
 {
 
-static fn make_dims_list(const usize dims[], u32 rank) -> FixedList<usize, 8> {
-    mut dims_list = FixedList<usize, 8>();
+static fn make_dims_list(const u64 dims[], u32 rank) -> FixedList<u64, 8> {
+    mut dims_list = FixedList<u64, 8>();
 
     for (mut i = 0u; i < rank; ++i) {
         dims_list.push(dims[i]);
@@ -18,8 +18,8 @@ static fn make_dims_list(const usize dims[], u32 rank) -> FixedList<usize, 8> {
     return dims_list;
 }
 
-static fn get_total_cnt(const usize dims[], u32 rank) -> usize {
-    mut total_cnt = usize(1);
+static fn get_total_cnt(const u64 dims[], u32 rank) -> u64 {
+    mut total_cnt = u64(1);
 
     for (mut i = 0u; i < rank; ++i) {
         total_cnt *= dims[i];
@@ -28,7 +28,7 @@ static fn get_total_cnt(const usize dims[], u32 rank) -> usize {
     return total_cnt;
 }
 
-pub fn _mnew(Type type, const usize dims[], u32 rank) noexcept -> void* {
+pub fn _mnew(Type type, const u64 dims[], u32 rank) noexcept -> void* {
     let dims_list = make_dims_list(dims, rank);
     let total_cnt = get_total_cnt(dims, rank);
 
@@ -56,7 +56,7 @@ pub fn _mdel(Type type, void* raw) noexcept -> void {
     }
 }
 
-pub fn _mcpy(Type type, void* dst, const void* src, const usize dims[], u32 rank) noexcept -> void {
+pub fn _mcpy(Type type, void* dst, const void* src, const u64 dims[], u32 rank) noexcept -> void {
     (void)type;
     let dims_list = make_dims_list(dims, rank);
     let total_cnt = get_total_cnt(dims, rank);

@@ -25,6 +25,18 @@ pub fn Thread::join() noexcept -> Result<void> {
     return Result<void>::Ok();
 }
 
+pub fn Thread::id() const noexcept -> u64 {
+    return u64(_thr);
+}
+
+pub fn Thread::name() const noexcept -> FixedStr<256> {
+    return "";
+}
+
+pub fn Thread::set_name(str name) noexcept -> void {
+    (void)name;
+}
+
 static fn posix_thread_callback(void* args) -> void* {
     using res_t = FnBox<void()>::res_t;
 
@@ -51,28 +63,34 @@ pub fn Builder::spawn_fn(FnBox<void()>::res_t* addr) const noexcept -> Thread {
         return attr;
     }();
 
-    let thr = pthread_t();
+    mut thr = pthread_t();
     let ret = ::pthread_create(&thr, &attr, &posix_thread_callback, addr);
-    let res = Thread(thr_t(thr));
+    let res = Thread(thr_t(u64(thr)));
 
     if (ret != 0) {
         return res;
     }
 
+#ifndef USTD_OS_MACOS
     let name = FixedCStr<1024>(_name);
     ::pthread_setname_np(thr, name);
+#endif
 
     return res;
 }
 
 pub fn current() noexcept -> Thread {
-    let tid = thr_t(::pthread_self());
+    let tid = thr_t(u64(::pthread_self()));
     return Thread{ tid };
 }
 
 
 pub fn yield() noexcept -> void {
+#ifdef USTD_OS_MACOS
+    ::pthread_yield_np();
+#else
     ::pthread_yield();
+#endif    
 }
 
 }
