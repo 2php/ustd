@@ -6,10 +6,12 @@ namespace ustd
 {
 
 template<class T>
-class Option;
-
-template<class T>
 struct Iter;
+
+template<typename T>
+struct Slice;
+
+using str = Slice<const char>;
 
 template<typename T>
 struct Slice
@@ -207,56 +209,6 @@ struct Slice
         return Option<size_t>::None();
     }
 
-    // method: push
-    template<class ...U>
-    fn push(U&& ...u) noexcept -> Option<Slice&> {
-        if (this->is_full()) return Option<Slice&>::None();
-
-        let pos = sync::fetch_and_add(&_size, 1u);
-        let ptr = _data + pos;
-        new(ptr)T(as_fwd<U>(u)...);
-        return Option<Slice&>::Some(*this);
-    }
-
-    // method: push
-    template<class ...U>
-    fn pushn(u32 n, U&& ...u) noexcept -> Option<Slice&> {
-        if (this->is_full()) return Option<Slice&>::None();
-        if (n == 0)          return Option<Slice&>::Some(*this);
-
-        let pos = sync::fetch_and_add(&_size, n);
-        let ptr = _data + pos;
-        for (u32 i = 0; i < n; ++i) {
-            new(&ptr[i])T(as_fwd<U>(u)...);
-        }
-
-        return Option<Slice&>::Some(*this);
-    }
-
-    // method: push_slice
-    template<class U>
-    fn push_slice(Slice<U> v) noexcept -> Option<Slice&> {
-        if (v._size == 0)                return Option<Slice&>::Some(*this);
-        if (_size + v._size > _capacity) return Option<Slice&>::None();
-
-        let pos = sync::fetch_and_add(&_size, v._size);
-        let ptr = _data + pos;
-
-        for (mut i = 0u; i < v._size; ++i) {
-            new(ptr + i)T(v[i]);
-        }
-
-        return Option<Slice&>::Some(*this);
-    }
-
-    // method: pop
-    fn pop() noexcept -> Option<T> {
-        if (is_empty()) return Option<T>::None();
-
-        let pos = sync::fetch_and_sub(&_size, 1u);
-        mut& val = _data[pos - 1];
-        return Option<T>::Some(as_mov(val));
-    }
 #pragma endregion
 
 #pragma region iter
@@ -267,6 +219,77 @@ struct Slice
 
     fn into_iter() noexcept -> Iter<type_t> {
         return { _data, _size };
+    }
+#pragma endregion
+
+#pragma region push/pop
+public:
+    // method: push
+    template<class ...U>
+    fn push(U&& ...u) noexcept -> Option<Slice&> {
+        if (_size + 1 > _capacity) {
+            return Option<Slice&>::None();
+        }
+        _push(as_fwd<U>(u)...);
+        return Option<Slice&>::Some(*this);
+    }
+
+    // method: push
+    template<class ...U>
+    fn pushn(u32 n, U&& ...u) noexcept -> Option<Slice&> {
+        if (_size + n > _capacity) {
+            return Option<Slice&>::None();
+        }
+
+        _pushn(n, as_fwd<U>(u)...);
+        return Option<Slice&>::Some(*this);
+    }
+
+    // method: push_slice
+    Option<Slice&> push_slice(Slice<const T> v) noexcept _if(trivial<T>::$copy) {
+        if (_size + v._size > _capacity) {
+            return Option<Slice&>::None();
+        }
+        _push_slice(v);
+        return Option<Slice&>::Some(*this);
+    }
+
+    // method: pop
+    fn pop() noexcept -> Option<T> {
+        return _pop();
+    }
+
+protected:
+    // method: push
+    template<class ...U>
+    fn _push(U&& ...u) noexcept -> void {
+        ustd::ctor(&_data[_size++], as_fwd<U>(u)...);
+    }
+
+    // method: push
+    template<class ...U>
+    fn _pushn(u32 n, U&& ...u) noexcept -> void {
+        for (mut i = 0u; i < n; ++i) {
+            ustd::ctor(&_data[_size++], as_fwd<U>(u)...);
+        }
+    }
+
+    // method: push_slice
+    void _push_slice(Slice<const T> v) noexcept _if(trivial<T>::$copy) {
+        let dst = _data + _size;
+        let src = v._data;
+        ustd::mcpy(dst, src, v._size);
+
+        _size += v._size;
+    }
+
+    // method: pop
+    fn _pop() noexcept -> Option<T> {
+        if (_size == 0) {
+            return Option<T>::None();
+        }
+        mut& res = _data[(_size--) - 1];
+        return Option<T>::Some(as_mov(res));
     }
 #pragma endregion
 

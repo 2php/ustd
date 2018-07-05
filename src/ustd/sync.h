@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ustd/sync/arc.h"
+#include "ustd/sync/atomic.h"
 #include "ustd/sync/barrier.h"
 #include "ustd/sync/condvar.h"
 #include "ustd/sync/mutex.h"

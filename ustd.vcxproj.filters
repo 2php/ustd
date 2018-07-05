@@ -176,9 +176,6 @@
     <ClInclude Include="src\ustd\core\str.h">
       <Filter>ustd\core</Filter>
     </ClInclude>
-    <ClInclude Include="src\ustd\core\string.h">
-      <Filter>ustd\core</Filter>
-    </ClInclude>
     <ClInclude Include="src\ustd\thread\thread.h">
       <Filter>ustd\thread</Filter>
     </ClInclude>

@@ -112,7 +112,6 @@
     <ClInclude Include="src\ustd\core\vec.h" />
     <ClInclude Include="src\ustd\core\slice.h" />
     <ClInclude Include="src\ustd\core\str.h" />
-    <ClInclude Include="src\ustd\core\string.h" />
     <ClInclude Include="src\ustd\core\builtin.h" />
     <ClInclude Include="src\ustd\core\list.h" />
     <ClInclude Include="src\ustd\cuda.h" />

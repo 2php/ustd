@@ -60,8 +60,6 @@ pub fn _mcpy(Type type, void* dst, const void* src, const usize dims[], u32 rank
     (void)type;
     let dims_list = make_dims_list(dims, rank);
     let total_cnt = get_total_cnt(dims, rank);
-    log::trace("ustd::mem::mcpy<{}>(dst={}, src={}, dims={4})", dst, src, dims_list);
-
     ustd_builtin(memcpy)(dst, src, type._size*total_cnt);
 }
 

@@ -42,7 +42,7 @@ public:
         if (!_valid) new(&_err)E(as_mov(other._err));
     }
 
-    Result(const Result& other) __enable_if__(trait<T>::$copy && trait<E>::$copy): _valid(other._valid), _nil() {
+    Result(const Result& other) _if(trait<T>::$copy && trait<E>::$copy): _valid(other._valid), _nil() {
         if (_valid)  new(&_ok) T(other._ok);
         if (!_valid) new(&_err)E(other._err);
     }

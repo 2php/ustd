@@ -28,7 +28,7 @@ pub fn Pool::async_run(str thr_name) noexcept -> JoinHandle<void> {
 unittest(Pool) {
     mut pool = Pool::with_capacity(4096);
 
-    volatile mut j = 0u;
+    mut j = 0u;
     for(mut i = 0u; i < 100u; ++i) {
         pool.push([i, &j] {
             let k = sync::fetch_and_add(&j, 1u);

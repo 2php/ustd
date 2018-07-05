@@ -19,7 +19,7 @@ struct TMove
     TMove(TMove&&   other) : _id(other._id) { --other._id; }
 };
 
-unittest(Option)
+unittest(Result)
 {
     // copy
     if (true) {

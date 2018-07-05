@@ -1,7 +1,7 @@
 #pragma once
 
-#include "ustd/core/fmt.h"
 #include "ustd/core/option.h"
+#include "ustd/core/slice.h"
 
 namespace ustd
 {
@@ -24,6 +24,7 @@ struct Type
     pub fn to_str() const noexcept->str;
 };
 
+class Formatter;
 pub fn trait_sfmt(Formatter& fmt, const Type& type) noexcept -> void;
 
 template<typename T>

@@ -310,8 +310,9 @@ public:
     Tree(Tree&& other) noexcept
         : Dom(*this), _vec(as_mov(other._vec))
     {
-        mut tmp = Dom(_vec, other._index);
-        ustd::swap(static_cast<Dom&>(*this), tmp);
+        mut  src = Dom(_vec, other._index);
+        mut& dst = static_cast<Dom&>(*this);
+        ustd::swap(dst, src);
     }
 
     static fn with_capacity(u32 capacity) noexcept -> Tree {

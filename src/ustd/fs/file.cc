@@ -187,34 +187,38 @@ pub fn File::seek(SeekFrom pos) noexcept -> Result<u64> {
     return Result<u64>::Ok(usize(res));
 }
 
-pub fn File::read(void* dat, u32 size) noexcept -> Result<u32> {
-    if (_fid == fid_t::Invalid) return Result<u32>::Err(os::Error::InvalidData);
+pub fn File::read(void* dat, u64 size) noexcept -> Result<u64> {
+    if (_fid == fid_t::Invalid) {
+        return Result<u64>::Err(os::Error::InvalidData);
+    }
 
 #ifdef _UCRT
-    let ret = ::_read(int(_fid), dat, size);
+    let ret = ::_read(int(_fid), dat, u32(size));
 #else
     let ret = ::read(int(_fid), dat, size);
 #endif
 
-    if (ret < 0)  return Result<u32>::Err(os::get_error());
-    if (ret == 0) return Result<u32>::Err(os::Error::UnexpectedEof);
+    if (ret < 0)  return Result<u64>::Err(os::get_error());
+    if (ret == 0) return Result<u64>::Err(os::Error::UnexpectedEof);
 
-    return Result<u32>::Ok(u32(ret));
+    return Result<u64>::Ok(u64(ret));
 }
 
-pub fn File::write(const void* dat, u32 size) noexcept -> Result<u32> {
-    if (_fid == fid_t::Invalid) return Result<u32>::Err(os::Error::InvalidData);
+pub fn File::write(const void* dat, u64 size) noexcept -> Result<u64> {
+    if (_fid == fid_t::Invalid) {
+        return Result<u64>::Err(os::Error::InvalidData);
+    }
 
 #ifdef _UCRT
-    let ret = ::_write(int(_fid), dat, size);
+    let ret = ::_write(int(_fid), dat, u32(size));
 #else
     let ret = ::write(int(_fid), dat, size);
 #endif
 
-    if (ret <  0) return Result<u32>::Err(os::get_error());
-    if (ret == 0) return Result<u32>::Err(os::Error::UnexpectedEof);
+    if (ret <  0) return Result<u64>::Err(os::get_error());
+    if (ret == 0) return Result<u64>::Err(os::Error::UnexpectedEof);
 
-    return Result<u32>::Ok(u32(ret));
+    return Result<u64>::Ok(u64(ret));
 }
 
 #pragma endregion
@@ -243,7 +247,7 @@ pub fn TxtFile::create(Path path) noexcept->Result<TxtFile> {
     return File::create_impl(path, FileType::Txt).map([](File&& f) { return TxtFile(as_mov(f)); });
 }
 
-pub fn TxtFile::write_str(str fmt) noexcept -> Result<u32> {
+pub fn TxtFile::write_str(str fmt) noexcept -> Result<u64> {
     let res = File::write(fmt._data, fmt._size);
     return res;
 }
@@ -275,18 +279,18 @@ fn Stream::from_file(File& file) -> Stream {
     return Stream(file);
 }
 
-pub fn Stream::flush() noexcept -> Result<u32> {
-    if (_file == nullptr)   return Result<u32>::Err(os::Error::InvalidData);
-    if (_wbuf.len == 0)     return Result<u32>::Ok(0u);
+pub fn Stream::flush() noexcept -> Result<u64> {
+    if (_file == nullptr)   return Result<u64>::Err(os::Error::InvalidData);
+    if (_wbuf.len == 0)     return Result<u64>::Ok(0u);
 
     let res = _file->write(_wbuf.data, _wbuf.len);
     _wbuf._size = 0;
     return res;
 }
 
-pub fn Stream::write(const void* data, u32 size) noexcept -> Result<u32> {
-    if (_file == nullptr)               return Result<u32>::Err(os::Error::InvalidData);
-    if (data == nullptr || size == 0)   return Result<u32>::Err(os::Error::InvalidInput);
+pub fn Stream::write(const void* data, u64 size) noexcept -> Result<u64> {
+    if (_file == nullptr)               return Result<u64>::Err(os::Error::InvalidData);
+    if (data == nullptr || size == 0)   return Result<u64>::Err(os::Error::InvalidInput);
 
     // flush
     if (_wbuf.len + size > _wbuf.capacity) {
@@ -300,16 +304,16 @@ pub fn Stream::write(const void* data, u32 size) noexcept -> Result<u32> {
 
     // push dat to buffer
     _wbuf.push_slice(Slice<const u8>(static_cast<const u8*>(data), size));
-    return Result<u32>::Ok(size);
+    return Result<u64>::Ok(size);
 }
 
-pub fn Stream::write_str(str s) noexcept->Result<u32> {
+pub fn Stream::write_str(str s) noexcept->Result<u64> {
     return write(reinterpret_cast<const u8*>(s._data), s._size);
 }
 
-pub fn Stream::read(void* data, u32 size) noexcept -> Result<u32> {
-    if (_file == nullptr)               return Result<u32>::Err(os::Error::InvalidData);
-    if (data == nullptr || size == 0)   return Result<u32>::Err(os::Error::InvalidInput);
+pub fn Stream::read(void* data, u64 size) noexcept -> Result<u64> {
+    if (_file == nullptr)               return Result<u64>::Err(os::Error::InvalidData);
+    if (data == nullptr || size == 0)   return Result<u64>::Err(os::Error::InvalidInput);
 
     mut rem_dat = static_cast<u8*>(data);
     mut rem_cnt = size;
@@ -331,11 +335,11 @@ pub fn Stream::read(void* data, u32 size) noexcept -> Result<u32> {
         rem_cnt -= cnt;
     }
 
-    if (rem_cnt == 0) return Result<u32>::Ok(size);
+    if (rem_cnt == 0) return Result<u64>::Ok(size);
 
     // read from file
     if (rem_cnt >= $buf_size) {
-        _file->read(rem_dat, rem_cnt).map([=](u32 x) { return x + (size - rem_cnt); });
+        _file->read(rem_dat, rem_cnt).map([=](u64 x) { return x + (size - rem_cnt); });
     }
 
     // read from buf 
@@ -346,10 +350,10 @@ pub fn Stream::read(void* data, u32 size) noexcept -> Result<u32> {
         _rbuf._size = u32(res._ok);
     }
 
-    return this->read(rem_dat, rem_cnt).map([=](u32 x) { return x + (size - rem_cnt);  });
+    return this->read(rem_dat, rem_cnt).map([=](u64 x) { return x + (size - rem_cnt);  });
 }
 
-pub fn Stream::read_str(StrView& str) noexcept -> Result<u32> {
+pub fn Stream::read_str(StrView& str) noexcept -> Result<u64> {
     let ptr = str._data + str._size;
     let cnt = str._capacity - str._size;
     let res = this->read(reinterpret_cast<u8*>(ptr), cnt);
@@ -372,10 +376,10 @@ pub fn Stream::read_str() noexcept -> Result<String> {
 
 #pragma region funs
 
-pub fn save_str(Path path, str text) -> Result<u32> {
+pub fn save_str(Path path, str text) -> Result<u64> {
     mut file_opt = TxtFile::create(path);
     if (file_opt.is_err()) {
-        return Result<u32>::Err(file_opt._err);
+        return Result<u64>::Err(file_opt._err);
     }
 
     mut& file = file_opt._ok;

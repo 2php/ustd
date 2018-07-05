@@ -86,10 +86,10 @@ public:
     pub fn seek(SeekFrom pos) noexcept ->Result<u64>;
 
     // method: write
-    pub fn read(void* dat, u32 size) noexcept->Result<u32>;
+    pub fn read(void* dat, u64 size) noexcept->Result<u64>;
 
     // method: write
-    pub fn write(const void* dat, u32 sizew) noexcept->Result<u32>;
+    pub fn write(const void* dat, u64 size) noexcept->Result<u64>;
 
 protected:
     // ctor: struct
@@ -119,10 +119,10 @@ public:
     // ctor: create for write
     static pub fn create(Path path) noexcept->Result<TxtFile>;
 
-    pub fn write_str(str text) noexcept->Result<u32>;
+    pub fn write_str(str text) noexcept->Result<u64>;
 
     template<class ...U>
-    fn write_fmt(str fmt, const U& ...u) noexcept -> Result<u32> {
+    fn write_fmt(str fmt, const U& ...u) noexcept -> Result<u64> {
         let text    = sformat(fmt, u...);
         let res     = write_str(text);
         return res;
@@ -160,18 +160,18 @@ public:
 
     static fn from_file(File& file)->Stream;
 
-    pub fn flush()                          noexcept -> Result<u32>;
-    pub fn write(const void* dat, u32 size) noexcept -> Result<u32>;
-    pub fn read (void*       dat, u32 size) noexcept -> Result<u32>;
+    pub fn flush()                          noexcept -> Result<u64>;
+    pub fn write(const void* dat, u64 size) noexcept -> Result<u64>;
+    pub fn read (void*       dat, u64 size) noexcept -> Result<u64>;
 
 #pragma region text file
-    pub fn write_str(str s) noexcept->Result<u32>;
-    pub fn read_str(StrView& str) noexcept->Result<u32>;
-    pub fn read_str() noexcept->Result<String>;
+    pub fn write_str(str s)         noexcept -> Result<u64>;
+    pub fn read_str(StrView& str)   noexcept -> Result<u64>;
+    pub fn read_str()               noexcept -> Result<String>;
 
     // method: write_fmt
     template<class ...U>
-    fn write_fmt(str fmt, const U& ...u) noexcept -> Result<u32> {
+    fn write_fmt(str fmt, const U& ...u) noexcept -> Result<u64> {
         let outbuf = format(fmt, u...);
         let res    = write_str(outbuf);
         return res;
@@ -183,10 +183,10 @@ protected:
 };
 
 pub fn load_str(Path path)           -> Result<String>;
-pub fn save_str(Path path, str text) -> Result<u32>;
+pub fn save_str(Path path, str text) -> Result<u64>;
 
 template<class ...U>
-fn save_fmt(Path path, str fmt, const U& ...u) -> Result<u32> {
+fn save_fmt(Path path, str fmt, const U& ...u) -> Result<u64> {
     let text = TxtFile::sformat(fmt, u...);
     let res  = save_str(path, text);
     return res;

@@ -10,7 +10,7 @@
 #endif
 
 /* enable_if */
-#define __enable_if__(...)  __attribute__((enable_if(__VA_ARGS__, "enable_if: failed")))
+#define _if(...)  __attribute__((enable_if(__VA_ARGS__, "enable_if: failed")))
 
 /* pub */
 #ifndef pub

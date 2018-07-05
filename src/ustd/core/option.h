@@ -5,7 +5,7 @@
 namespace ustd
 {
 
-template<class T>
+template<typename T>
 struct Slice;
 
 using str = Slice<const char>;
@@ -36,7 +36,7 @@ public:
     }
 
     // ctor[copy]
-    Option(const Option& other) noexcept __enable_if__(trait<T>::$copy): _valid(other._valid), _nil() {
+    Option(const Option& other) noexcept _if(trait<T>::$copy): _valid(other._valid), _nil() {
         if (!_valid) return;
         new(&_val)T(other._val);
     }
@@ -71,36 +71,48 @@ public:
 #pragma region except
     template<typename ...U>
     fn except(const str& fmt, const U& ...u) && -> T {
-        if (!is_some()) { ustd::panic(fmt, u...); }
+        if (!is_some()) {
+            ustd::panic(fmt, u...);
+        }
         return as_mov(_val);
     }
 
     template<typename ...U>
     fn except(const str& fmt, const U& ...u) & -> T& {
-        if (!is_some()) { ustd::panic(fmt, u...); }
+        if (!is_some()) {
+            ustd::panic(fmt, u...);
+        }
         return _val;
     }
 
     template<typename ...U>
     fn except(const str& fmt, const U& ...u) const& -> const T& {
-        if (!is_some()) { ustd::panic(fmt, u...); }
+        if (!is_some()) { 
+            ustd::panic(fmt, u...);
+        }
         return _val;
     }
 #pragma endregion
 
 #pragma region unwrap
     fn unwrap() && noexcept -> T {
-        if (!is_some()) ustd::panic("ustd::option::Option<{}>: expect `is_some` failed.", typeof<T>());
+        if (!is_some()) {
+            ustd::panic("ustd::option::Option<{}>: expect `is_some` failed.", typeof<T>());
+        }
         return as_mov(_val);
     }
 
     fn unwrap() & noexcept -> T& {
-        if (!is_some()) ustd::panic("ustd::option::Option<{}>: expect `is_some` failed.", typeof<T>());
+        if (!is_some()) {
+            ustd::panic("ustd::option::Option<{}>: expect `is_some` failed.", typeof<T>());
+        }
         return _val;
     }
 
     fn unwrap() const& noexcept -> const T& {
-        if (!is_some()) ustd::panic("ustd::option::Option<{}>: expect `is_some` failed.", typeof<T>());
+        if (!is_some()) {
+            ustd::panic("ustd::option::Option<{}>: expect `is_some` failed.", typeof<T>());
+        }
         return _val;
     }
 #pragma endregion

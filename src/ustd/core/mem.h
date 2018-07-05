@@ -38,4 +38,16 @@ fn mcpy(T* dst, const T* src, const usize (&dims)[N]) -> void {
     _mcpy(typeof<T>(), dst, src, dims, 1);
 }
 
+template<class T>
+fn mmov(T* dst, T* src, u32 count) -> void {
+    if constexpr(trivial<T>::$copy) {
+        ustd::mcpy(dst, src, count);
+    }
+    else {
+        for (mut i = 0u; i < count; i++) {
+            ustd::ctor(&dst[i], as_mov(src[i]));
+        }
+    }
+}
+
 }

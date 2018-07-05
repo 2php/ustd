@@ -1,6 +1,5 @@
 #pragma once
 
-#include "ustd/core/string.h"
 #include "ustd/core/panic.h"
 #include "ustd/core/vec.h"
 #include "ustd/core/tuple.h"

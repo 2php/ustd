@@ -1,8 +1,8 @@
 #pragma once
 
 #include "ustd/core/slice.h"
-#include "ustd/core/sync.h"
 #include "ustd/core/mem.h"
+#include "ustd/core/ops.h"
 
 namespace ustd
 {
@@ -55,6 +55,69 @@ public:
    }
 #pragma endregion
 
+#pragma region methods
+    fn reserve(u32 new_capacity) noexcept {
+        let old_capacity = base::_capacity;
+        if (new_capacity <= old_capacity) {
+            return;
+        }
+
+        let old_data = base::_data;
+        let new_data = mnew<T>(new_capacity);
+        mmov(old_data, new_data, base::_size);
+
+        mdel(old_data);
+        base::_data     = new_data;
+        base::_capacity = new_capacity;
+    }
+
+    fn grow(u32 count) noexcept {
+        let old_capacity = base::_capacity;
+        let min_capacity = old_capacity + count;
+        let max_capacity = (old_capacity + old_capacity / 4 + 63) & (~63u);
+        let new_capacity = ustd::max(min_capacity, max_capacity);
+        reserve(new_capacity);
+    }
+#pragma endregion
+
+#pragma region push/pop
+    // method: push
+    template<class ...U>
+    fn push(U&& ...u) noexcept -> Option<List&> {
+        if (base::_size + 1 > base::_capacity) {
+            grow(1);
+        }
+        base::_push(as_fwd<U>(u)...);
+        return Option<List&>::Some(*this);
+    }
+
+    // method: push
+    template<class ...U>
+    fn pushn(u32 n, U&& ...u) noexcept -> Option<List&> {
+        if (base::_size + n > base::_capacity) {
+            grow(n);
+        }
+
+        base::_pushn(n, as_fwd<U>(u)...);
+        return Option<List&>::Some(*this);
+    }
+
+    // method: push_slice
+    template<class U>
+    fn push_slice(Slice<U> v) noexcept -> Option<List&> {
+        if (base::_size + v._size > base::_capacity) {
+            grow(v._size);
+        }
+        base::_push_slice(v);
+        return Option<List&>::Some(*this);
+    }
+
+    // method: pop
+    fn pop() noexcept -> Option<T> {
+        return base::_pop();
+    }
+#pragma endregion
+
 #pragma region as_...
     fn as_deque() && ->Deque<T, List> {
         return Deque<T, List>::from_list(as_mov(*this));
@@ -96,6 +159,7 @@ public:
         T   _buf[N];
     };
 
+#pragma region ctor/dtor
     // ctor:
     FixedList() noexcept : base(_buf, 0, N)
     {}
@@ -110,10 +174,12 @@ public:
     FixedList(FixedList&& other) noexcept: base(_buf, other._size, N) {
         other._size = 0;
 
-        for (u32 i = 0; i < base::_size; ++i) {
-            ustd::ctor(&_buf[i], as_mov(other._buf[i]));
-        }
+        let dst = _buf;
+        let src = other._buf;
+        let cnt = base::_size;
+        ustd::mmov(dst, src, cnt);
     }
+#pragma endregion
 
 #pragma region as_...
     fn as_deque() && ->Deque<T, FixedList> {
@@ -191,7 +257,7 @@ public:
             let tail = _tail;
             mut idx = _head;
             while (true) {
-                _list[idx].~T();
+                ustd::dtor(&_list[idx]);
                 if (idx == tail) break;
                 idx = (idx + 1) % _list._capacity;
             }
@@ -249,90 +315,63 @@ protected:
 #pragma region push/pop
     template<Opt opt, typename ...U>
     fn _push_front(U&& ...val) noexcept -> Option<Deque&> {
-        while (true) {
-            let old_head = _head;
-            let new_head = (old_head - 1 + _list._capacity) % _list._capacity;
-
-            if (is_full()) {
-                if constexpr(opt == Opt::OverWrite) {
-                    _pop_back();
-                }
-                else {
-                    return Option<Deque&>::None();
-                }
+        if (is_full()) {
+            if constexpr(opt == Opt::OverWrite) {
+                _pop_back();
             }
-
-            let cmp_test = sync::compare_and_swap(&_head, old_head, new_head);
-            if (cmp_test) {
-                sync::fetch_and_add(&_list._size, 1u);
-                new(&_list[new_head])T(as_fwd<U>(val)...);
-                return Option<Deque&>::Some(*this);
+            else {
+                return Option<Deque&>::None();
             }
         }
 
-        return Option<Deque&>::None();
+        ++_list._size;
+        _head = (_head - 1 + _list._capacity) % _list._capacity;
+
+        ustd::ctor(&_list[_head], as_fwd<U>(val)...);
+        return Option<Deque&>::Some(*this);
     }
 
     fn _pop_front() noexcept -> Option<T> {
-        while (true) {
-            let old_head = _head;
-            let new_head = (old_head + 1) % _list._capacity;
-
-            if (is_empty()) {
-                return Option<T>::None();
-            }
-            let cmp_test = sync::compare_and_swap(&_head, old_head, new_head);
-            if (cmp_test) {
-                sync::fetch_and_sub(&_list._size, 1u);
-                return Option<T>::Some(as_mov(_list[old_head]));
-            }
+        if (is_empty()) {
+            return Option<T>::None();
         }
 
-        return Option<T>::None();
+        mut& res = _list[_head];
+
+        --_list._size;
+        _head = (_head + 1) % _list._capacity;
+
+        return Option<T>::Some(as_mov(res));
     }
 
     template<Opt opt, typename ...U>
     fn _push_back(U&& ...val) noexcept -> Option<Deque&> {
-        while (true) {
-            if (is_full()) {
-                if constexpr (opt == Opt::OverWrite) {
-                    _pop_front();
-                }
-                else {
-                    return Option<Deque&>::None();
-                }
+        if (is_full()) {
+            if constexpr (opt == Opt::OverWrite) {
+                _pop_front();
             }
-
-            let old_tail = _tail;
-            let new_tail = (old_tail + 1) % _list._capacity;
-            let cmp_test = sync::compare_and_swap(&_tail, old_tail, new_tail);
-
-            if (cmp_test) {
-                sync::fetch_and_add(&_list._size, 1u);
-                new(&_list[new_tail])T(as_fwd<U>(val)...);
-                return Option<Deque&>::Some(*this);
+            else {
+                return Option<Deque&>::None();
             }
         }
 
-        return Option<Deque&>::None();
+        ++_list._size;
+        _tail = (_tail + 1) % _list._capacity;
+        ustd::ctor(&_list[_tail], as_fwd<U>(val)...);
+        return Option<Deque&>::Some(*this);
     }
 
     fn _pop_back() noexcept -> Option<T> {
-        while (true) {
-            if (is_empty()) return Option<T>::None();
-
-            let old_tail = _tail;
-            let new_tail = (old_tail - 1 + _list._capacity) % _list._capacity;
-            let cmp_test = sync::compare_and_swap(&_tail, old_tail, new_tail);
-
-            if (cmp_test) {
-                sync::fetch_and_sub(&_list._size, 1u);
-                mut tmp = as_mov(_list[old_tail]);
-                return Option<T>::Some(as_mov(tmp));
-            }
+        if (is_empty()) {
+            return Option<T>::None();
         }
 
-        return Option<T>::None();
+        mut res = _list[_tail];
+
+        --_list._size;
+        _tail = (_tail - 1 + _list._capacity) % _list._capacity;
+
+        return Option<T>::Some(as_mov(res));
     }
 #pragma endregion
 
@@ -493,26 +532,35 @@ public:
     }
 
     fn top() noexcept -> Option<T&> {
-        if (is_empty()) return Option<T&>::None();
+        if (is_empty()) {
+            return Option<T&>::None();
+        }
         return Option<T&>::Some(_list[0]);
     }
 
     fn top() const noexcept -> Option<const T&> {
-        if (is_empty()) return Option<const T&>::None();
+        if (is_empty()) {
+            return Option<const T&>::None();
+        }
         return Option<const T&>(_list[0]);
     }
 
     template<class ...U>
     fn push(U&& ...u) noexcept -> Option<Heap&> {
          mut res = _list.push(as_fwd<U>(u)...);
-         if (res.is_none()) return Option<Heap&>::None();
+         if (res.is_none()) {
+             return Option<Heap&>::None();
+         }
 
          this->shift_up(_list._size - 1);
          return Option<Heap&>::Some(*this);
     }
 
     fn pop() noexcept -> Option<T> {
-        if (is_empty()) return Option<T>::None();
+        if (is_empty()) {
+            return Option<T>::None();
+        }
+
         ustd::swap(_list[0], _list[_list._size - 1]);
         mut res = _list.pop();
         shift_down(0);
