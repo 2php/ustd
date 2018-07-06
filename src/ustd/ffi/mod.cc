@@ -40,14 +40,7 @@ namespace ustd::ffi
 using namespace ustd::io;
 
 static fn get_mod_path(str name) noexcept -> fs::FixedPath<> {
-#if defined(USTD_OS_WINDOWS)
-    let res = fs::FixedPath<>::from_fmt("{}.dll", name);
-#elif defined(USTD_OS_LINUX)
-    let res = fs::FixedPath<>::from_fmt("lib{}.so", name);
-#elif defined(USTD_OS_MACOS)
-    let res = fs::FixedPath<>::from_fmt("lib{}.dylib", name);
-#endif
-
+    let res = fs::FixedPath<>::from_fmt("{}.{}", name, os::shared_ext);
     return res;
 }
 

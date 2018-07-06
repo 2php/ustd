@@ -5,7 +5,7 @@ namespace ustd::math
 
 unittest(vline)
 {
-    mut a = NDArray<f32>({ 8 });
+    mut a = NDArray<f32>::with_dims({ 8 });
     assert_eq(a.dims(), { 8 });
     a <<= vline(1.0f);
     for (u32 i = 0; i < a._dims[0]; ++i) {
@@ -20,14 +20,14 @@ unittest(vline)
 
 unittest(vsum)
 {
-    mut a1 = NDArray<f32>({8});
+    mut a1 = NDArray<f32>::with_dims({8});
     a1 <<= 1;
 
     mut sum_a1 = Scalar<f32>(0.f);
     sum_a1 <<= vsum(a1);
     assert_eq(sum_a1(), 8.f);
 
-    mut a2 = NDArray<f32, 2>({ 8, 8 });
+    mut a2 = NDArray<f32, 2>::with_dims({ 8, 8 });
     a2 <<= 1;
     mut sum_a2 = Scalar<f32>(0.f);
     sum_a2 <<= vsum(vsum(a2));
@@ -38,8 +38,8 @@ unittest(axpy)
 {
 
     let cnt     = 1024 * 1024;
-    mut x       = NDArray<f32>({ cnt });
-    mut y       = NDArray<f32>({ cnt });
+    mut x       = NDArray<f32>::with_dims({ cnt });
+    mut y       = NDArray<f32>::with_dims({ cnt });
     let a       = 0.1f;
     let loop    = 10;
 

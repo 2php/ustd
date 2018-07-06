@@ -35,40 +35,49 @@ enum class TexFilter {
 };
 
 #pragma region detail
-pub fn _dnew(Type type, u64  cnt) noexcept                                                 -> Result<void*>;
-pub fn _ddel(Type type, void* ptr) noexcept                                                -> Result<void>;
+pub fn _dnew(Type type, u32 rank, const u64 dims[]) noexcept                                -> void*;
+pub fn _ddel(Type type, void* ptr)                  noexcept                                -> void;
 
-pub fn _hnew(Type type, u64   cnt) noexcept                                                -> Result<void*>;
-pub fn _hdel(Type type, void* ptr) noexcept                                                -> Result<void>;
+pub fn _hnew(Type type, u32 rank, const u64 dims[]) noexcept                                -> void*;
+pub fn _hdel(Type type, void* ptr)                  noexcept                                -> void;
 
-pub fn _mcpy(Type type, void* dst, const void* src, u64   count) noexcept                  -> Result<void>;
+pub fn _mcpy(Type type, void* dst, const void* src, u32 rank, const u64 dims[]) noexcept    -> void;
 
-pub fn _anew(Type type, u32 rank, const u32 dims[]) noexcept                               -> Result<arr_t>;
-pub fn _adel(Type type, arr_t arr) noexcept                                                -> Result<void>;
-pub fn _acpy(Type type, arr_t dst, const void* src, u32 rank, const u32 dims[]) noexcept   -> Result<void>;
-pub fn _acpy(Type type, void* dst, arr_t       src, u32 rank, const u32 dims[]) noexcept   -> Result<void>;
+pub fn _anew(Type type, u32 rank, const u64 dims[]) noexcept                               -> arr_t;
+pub fn _adel(Type type, arr_t arr) noexcept                                                -> void;
+pub fn _acpy(Type type, arr_t dst, const void* src, u32 rank, const u64 dims[]) noexcept   -> void;
+pub fn _acpy(Type type, void* dst, arr_t       src, u32 rank, const u64 dims[]) noexcept   -> void;
 
-pub fn _tnew(Type type, arr_t arr, TexAddress addr, TexFilter filter) noexcept             -> Result<tex_t>;
-pub fn _tdel(Type type, tex_t tex) noexcept                                                -> Result<void>;
+pub fn _tnew(Type type, arr_t arr, TexAddress addr, TexFilter filter) noexcept             -> tex_t;
+pub fn _tdel(Type type, tex_t tex) noexcept                                                -> void;
 
-pub fn _sync() noexcept                                                                    -> Result<void>;
+pub fn _sync() noexcept                                                                    -> void;
 #pragma endregion
 
 #pragma region context
-inline fn sync() noexcept -> Result<void> {
-    let res = _sync();
-    return res;
+inline fn sync() noexcept -> void {
+    _sync();
 }
 
 #pragma endregion
 
 #pragma region memory
 template<class T>
-fn dnew(u64 cnt) noexcept -> Result<T*> {
-    mut res = _dnew(typeof<T>(), cnt);
-    return res.map([](void* ptr) { 
-        return static_cast<T*>(ptr);
-    });
+fn dnew(u64 cnt) noexcept -> T* {
+    let res = _dnew(typeof<T>(), &cnt, 1);
+    return static_cast<T*>(res);
+}
+
+template<class T, u32 N>
+fn dnew(const u64(&dims)[N]) noexcept -> T* {
+    let res = _dnew(typeof<T>(), N, dims);
+    return static_cast<T*>(res);
+}
+
+template<class T, class I, u32 N>
+fn dnew(const vec<I, N>& dims) noexcept -> T* {
+    let u64_dims = vec_cast<u64>(dims);
+    return dnew<T>(u64_dims._arr);
 }
 
 template<class T>
@@ -77,9 +86,21 @@ fn ddel(T* ptr) noexcept -> void {
 }
 
 template<class T>
-fn hnew(u64 cnt) noexcept -> Result<T*> {
-    mut res = _hnew(typeof<T>(), cnt);
-    return res.map([](void* ptr) { return static_cast<T*>(ptr); });
+fn hnew(u64 cnt) noexcept -> T* {
+    let res = _hnew(typeof<T>(), &cnt, 1);
+    return static_cast<T*>(res);
+}
+
+template<class T, u32 N>
+fn hnew(const u64(&dims)[N]) noexcept -> T* {
+    let res = _hnew(typeof<T>(), N, dims);
+    return static_cast<T*>(res);
+}
+
+template<class T, class I, u32 N>
+fn hnew(const vec<I, N>& dims) noexcept -> T* {
+    let u64_dims = vec_cast<u64>(dims);
+    return hnew<T>(u64_dims._arr);
 }
 
 template<class T>
@@ -88,12 +109,23 @@ fn hdel(T* ptr) noexcept -> void {
 }
 
 template<class T>
-fn mcpy(T* dst, const T* src, u64 cnt) noexcept -> void {
-    cuda::_mcpy(typeof<T>(), dst, src, cnt);
+fn mcpy(T* dst, const T* src, u64 count) -> void {
+    cuda::_mcpy(typeof<T>(), dst, src, 1, &count);
+}
+
+template<class T, u32 N>
+fn mcpy(T* dst, const T* src, const u64(&dims)[N]) -> void {
+    cuda::_mcpy(typeof<T>(), dst, src, 1, dims);
+}
+
+template<class T, class I, u32 N>
+fn mcpy(T* dst, const T* src, const vec<I, N>& dims) -> void {
+    let u64_dims = vec_cast<u64>(dims);
+    cuda::_mcpy(typeof<T>(), dst, src, N, u64_dims._arr);
 }
 
 template<class T>
-fn tnew(arr_t arr, TexAddress addr, TexFilter filter) -> Result<tex_t> {
+fn tnew(arr_t arr, TexAddress addr, TexFilter filter) -> tex_t {
     let res = _tnew(typeof<T>(), arr, addr, filter);
     return res;
 }
@@ -106,15 +138,15 @@ inline fn tdel(tex_t tex) -> void {
 
 #pragma region array
 template<class T, u32 N>
-fn anew(const u32(&dims)[N]) -> Result<arr_t> {
-    let rank = N;
-    let res = _anew(typeof<T>(), rank, dims);
+fn anew(const u64(&dims)[N]) -> arr_t {
+    let res = _anew(typeof<T>(), N, dims);
     return res;
 }
 
-template<class T, u32 N>
-fn anew(const vec<u32, N>& dims) -> Result<arr_t> {
-    return cuda::anew<T>(dims._arr);
+template<class T, class I, u32 N>
+fn anew(const vec<I, N>& dims) -> arr_t {
+    let u64_dims = vec_cast<u64>(dims);
+    return cuda::anew<T>(u64_dims._arr);
 }
 
 template<class T>
@@ -122,16 +154,16 @@ inline fn adel(arr_t arr) -> void {
     _adel(typeof<T>(), arr);
 }
 
-template<class T, u32 N>
-fn acpy(arr_t dst, const T* src, vec<u32,N> dims) noexcept -> Result<void> {
-    let res  = _acpy(typeof<T>(), dst, src, N, dims._arr);
-    return res;
+template<class T, class I, u32 N>
+fn acpy(arr_t dst, const T* src, const vec<I,N>& dims) noexcept -> void {
+    let u64_dims = vec_cast<u64>(dims);
+    _acpy(typeof<T>(), dst, src, N, u64_dims._arr);
 }
 
-template<class T, u32 N>
-fn acpy(T* dst, arr_t src, vec<u32,N> dims) noexcept -> Result<void> {
-    let res  = _acpy(typeof<T>(), dst, src, N, dims._arr);
-    return res;
+template<class T, class I, u32 N>
+fn acpy(T* dst, arr_t src, const vec<I,N>& dims) noexcept -> void {
+    let u64_dims = vec_cast<u64>(dims);
+    _acpy(typeof<T>(), dst, src, N, u64_dims._arr);
 }
 #pragma endregion
 

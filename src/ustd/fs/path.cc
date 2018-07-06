@@ -50,17 +50,17 @@ pub fn Path::get_fullpath() const noexcept -> FixedCStr<1024> {
     static let home_path = env::var("USERPROFILE");
     static let temp_path = env::var("TEMP");
 
-    if (this->starts_with(str("~/"))) {
+    if (this->starts_with("~/")) {
         if (res.push_slice(home_path).is_none()) goto ERROR;
-        s = s.slice(1u, s.len - 1u);
+        s = s.slice(1u, s._size - 1u);
     }
-    else if (s.starts_with(str("/tmp"))) {
+    else if (s.starts_with("/tmp")) {
         if (res.push_slice(temp_path).is_none()) goto ERROR;
-        s = s.slice(4u, s.len - 4u);
+        s = s.slice(4u, s._size - 4u);
     }
 #endif
 
-    if (s.starts_with(str("#/"))) {
+    if (s.starts_with("#/")) {
         if (res.push_slice(app_path).is_none()) { goto ERROR; }
         s = s.slice(1u, s._size - 1);
     }
@@ -205,7 +205,7 @@ pub fn current_exe() noexcept -> Path {
 
 #ifdef USTD_OS_WINDOWS
     let mod = ::GetModuleHandleA(nullptr);
-    let len = ::GetModuleFileNameA(mod, res._data, res.capacity);
+    let len = ::GetModuleFileNameA(mod, res._data, res._capacity);
     res._size = len;
     res.replace('\\', '/');
 #endif

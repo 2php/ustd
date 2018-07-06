@@ -320,7 +320,7 @@ public:
     {}
 
     fn do_fmt(const Dom& dom) -> void {
-        let node = dom.node;
+        let node = dom.node();
 
         switch (node._type) {
             case Type::$null:  _fmt("null");       break;
@@ -358,7 +358,7 @@ public:
                 // loop array elements
                 let cnt = node._size;
                 mut val = Dom(dom._nodes, dom._index + 1);
-                for (mut idx = 0u; idx < cnt; ++idx, val._index += val.node._next) {
+                for (mut idx = 0u; idx < cnt; ++idx, val._index += val.node()._next) {
                     do_fmt(val);
                     if (idx + 1 != cnt) {
                         _fmt.push_str(", ");
@@ -379,11 +379,11 @@ public:
                 let cnt = node._size;
                 mut key = Dom{ dom._nodes, dom._index + 1 };
                 mut val = Dom{ dom._nodes, dom._index + 2 };
-                for (mut idx = 0u; idx < cnt; ++idx, key._index += key.node._next, val._index += val.node._next) {
+                for (mut idx = 0u; idx < cnt; ++idx, key._index += key.node()._next, val._index += val.node()._next) {
                     if (idx!=0) _fmt.indent();
 
                     _fmt.push_str("\"");
-                    _fmt.push_str(str(key.node._key, key.node._size));
+                    _fmt.push_str(str(key.node()._key, key.node()._size));
                     _fmt.push_str("\": ");
 
                     do_fmt(val);

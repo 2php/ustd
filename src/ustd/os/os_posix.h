@@ -7,7 +7,7 @@ namespace ustd::os
 
 enum class Error: i32
 {
-    Success = 0,
+    Success,
     NotFound,
     PermissionDenied,
     ConnectionRefused,
@@ -29,8 +29,6 @@ enum class Error: i32
 };
 
 pub fn to_str(Error e) noexcept -> str;
-
-pub fn get_error() noexcept->Error;
 
 template <class T >
 using Result = ustd::Result<T, Error>;

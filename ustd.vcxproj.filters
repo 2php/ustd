@@ -47,9 +47,6 @@
     <ClCompile Include="src\ustd\log\logger.cc">
       <Filter>ustd\log</Filter>
     </ClCompile>
-    <ClCompile Include="src\ustd\sync\mutex.cc">
-      <Filter>ustd\sync</Filter>
-    </ClCompile>
     <ClCompile Include="src\ustd\ffi\mod.cc">
       <Filter>ustd\ffi</Filter>
     </ClCompile>
@@ -63,23 +60,14 @@
     <ClCompile Include="src\ustd\fs\file.cc">
       <Filter>ustd\fs</Filter>
     </ClCompile>
-    <ClCompile Include="src\ustd\os\posix.cc">
-      <Filter>ustd\os</Filter>
-    </ClCompile>
     <ClCompile Include="src\ustd\math\mkl.cc">
       <Filter>ustd\math</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ustd\sync\condvar.cc">
-      <Filter>ustd\sync</Filter>
     </ClCompile>
     <ClCompile Include="src\ustd\thread\pool.cc">
       <Filter>ustd\thread</Filter>
     </ClCompile>
     <ClCompile Include="src\ustd\math\complex.cc">
       <Filter>ustd\math</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ustd\os\windows.cc">
-      <Filter>ustd\os</Filter>
     </ClCompile>
     <ClCompile Include="src\ustd\math\ndarray.cc">
       <Filter>ustd\math</Filter>
@@ -117,17 +105,38 @@
     <ClCompile Include="src\ustd\core\result.cc">
       <Filter>ustd\core</Filter>
     </ClCompile>
-    <ClCompile Include="src\ustd\thread\thread_unix.cc">
-      <Filter>ustd\thread</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ustd\thread\thread_windows.cc">
-      <Filter>ustd\thread</Filter>
-    </ClCompile>
     <ClCompile Include="src\ustd\thread\thread.cc">
       <Filter>ustd\thread</Filter>
     </ClCompile>
     <ClCompile Include="src\ustd\task\scheduler.cc">
       <Filter>ustd\task</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ustd\sync\condvar_pthread.cc">
+      <Filter>ustd\sync</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ustd\sync\condvar_win32.cc">
+      <Filter>ustd\sync</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ustd\sync\mutex_pthread.cc">
+      <Filter>ustd\sync</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ustd\sync\mutex_win32.cc">
+      <Filter>ustd\sync</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ustd\os\os_posix.cc">
+      <Filter>ustd\os</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ustd\os\os_win32.cc">
+      <Filter>ustd\os</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ustd\thread\thread_pthread.cc">
+      <Filter>ustd\thread</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ustd\thread\thread_win32.cc">
+      <Filter>ustd\thread</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ustd\os\os_unix.cc">
+      <Filter>ustd\os</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -237,15 +246,6 @@
     <ClInclude Include="src\ustd\sync\rwlock.h">
       <Filter>ustd\sync</Filter>
     </ClInclude>
-    <ClInclude Include="src\ustd\os\unix.h">
-      <Filter>ustd\os</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ustd\os\windows.h">
-      <Filter>ustd\os</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ustd\os\posix.h">
-      <Filter>ustd\os</Filter>
-    </ClInclude>
     <ClInclude Include="src\ustd\ffi\mod.h">
       <Filter>ustd\ffi</Filter>
     </ClInclude>
@@ -254,9 +254,6 @@
     </ClInclude>
     <ClInclude Include="src\ustd\cuda.h">
       <Filter>ustd</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ustd\cuda\array.h">
-      <Filter>ustd\cuda</Filter>
     </ClInclude>
     <ClInclude Include="src\ustd\fs.h">
       <Filter>ustd</Filter>
@@ -341,6 +338,18 @@
     </ClInclude>
     <ClInclude Include="src\ustd\task\scheduler.h">
       <Filter>ustd\task</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ustd\os\os_posix.h">
+      <Filter>ustd\os</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ustd\os\os_unix.h">
+      <Filter>ustd\os</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ustd\os\os_win32.h">
+      <Filter>ustd\os</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ustd\cuda\ndarray.h">
+      <Filter>ustd\cuda</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -436,5 +445,6 @@
     <None Include="external\vcruntime\vcruntime140d.dll">
       <Filter>external\vcruntime</Filter>
     </None>
+    <None Include="xmake.lua" />
   </ItemGroup>
 </Project>

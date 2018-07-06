@@ -9,6 +9,8 @@ namespace ustd
 
 template<typename T> class List;
 
+using String = List<char>;
+
 template<typename T, typename List> class Deque;
 template<typename T, typename List> class Queue;
 template<typename T, typename List> class Stack;
@@ -20,8 +22,6 @@ class List : public Slice<T>
 {
 public:
     using base   = Slice<T>;
-    using type_t = typename base::type_t;
-    using size_t = typename base::size_t;
 
 #pragma region ctor/dtor
     // ctor: default
@@ -142,7 +142,7 @@ public:
 
 protected:
     // ctor:
-    List(type_t* data, size_t length, size_t capacity) noexcept
+    List(T* data, u32 length, u32 capacity) noexcept
         : base(data, length, capacity)
     {}
 };

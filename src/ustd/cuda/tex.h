@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ustd/cuda/api.h"
-#include "ustd/cuda/array.h"
+#include "ustd/cuda/ndarray.h"
 
 namespace ustd::cuda
 {
@@ -17,8 +17,8 @@ public:
     dims_t _dims;
 
     explicit Tex(dims_t dims, TexAddress border_mode = TexAddress::Clamp, TexFilter filter_mode = TexFilter::Point) : _dims(dims) {
-        _arr = cuda::anew<T>(_dims).unwrap();
-        _tex = cuda::tnew<T>(_arr, border_mode, filter_mode).unwrap();
+        _arr = cuda::anew<T>(_dims);
+        _tex = cuda::tnew<T>(_arr, border_mode, filter_mode);
     }
 
     explicit Tex(const u32(&dim)[N], TexAddress border_mode, TexFilter filter_mode = TexFilter::Point)
@@ -38,14 +38,12 @@ public:
         cuda::adel<T>(_arr);
     }
 
-    fn set(NDSlice<T,N> v) noexcept -> Result<Tex&> {
-        let res = acpy(_arr, v._data, v._dims);
-        return res.is_ok() ? Result<Tex&>::Ok(*this) : Result<Tex&>::Err(res._err);
+    fn set(NDSlice<T,N> v) noexcept -> void {
+        cuda::acpy(_arr, v._data, v._dims);
     }
 
-    fn get(NDSlice<T,N> v) noexcept -> Result<Tex&> {
-        let res = acpy(v._data, _arr, v._dims);
-        return res.is_ok() ? Result<Tex&>::Ok(*this) : Result<Tex&>::Err(res._err);
+    fn get(NDSlice<T,N> v) noexcept -> void {
+        cuda::acpy(v._data, _arr, v._dims);
     }
 };
 

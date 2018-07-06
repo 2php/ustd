@@ -76,13 +76,13 @@ pub fn Thread::set_name(str name)  noexcept -> void {
 
 #ifdef WIN10_1607
     if (name.is_empty()) {
-        name = "ustd::thread";
+        name = str("ustd::thread");
     }
 
     // str->osstr
     wchar_t wstr[256];
-    mut num = usize(0);
-    let ret = ::mbstowcs_s(&num, wstr, name.data, name.len);
+    mut num = u64(0);
+    let ret = ::mbstowcs_s(&num, wstr, name._data, name._size);
     if (ret != 0) return;
 
     // setname
@@ -107,9 +107,9 @@ pub fn Thread::name() const noexcept -> FixedStr<256> {
         return {};
     }
 
-    mut num = usize(0);
+    mut num = u64(0);
     let len = ::__builtin_wcslen(wstr);
-    ::wcstombs_s(&num, name.data, name.capacity, wstr, len);
+    ::wcstombs_s(&num, name._data, name._capacity, wstr, len);
     if (len <= 0u) return {};
 
     name._size = u32(len);

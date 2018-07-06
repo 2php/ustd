@@ -31,7 +31,7 @@ static fn _get_std_handle(int fid) -> std_handle_t {
     return res;
 }
 
-static fn _write_console(int fid, const void* buff, usize size) noexcept -> u32 {
+static fn _write_console(int fid, const void* buff, u64 size) noexcept -> u32 {
     static let stdout_handle = ::_get_std_handle(STDOUT_FILENO);
     static let stderr_handle = ::_get_std_handle(STDERR_FILENO);
     let handle = fid == STDOUT_FILENO ? stdout_handle : stderr_handle;

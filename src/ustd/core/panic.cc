@@ -9,7 +9,7 @@ pub fn panic(const str& msg) -> void {
 }
 
 pub fn panic() -> void {
-    log::error("ustd::panic");
+    log::error("ustd::panic()");
     throw PanicError();
 }
 

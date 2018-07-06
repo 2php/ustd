@@ -19,6 +19,25 @@ pub fn to_str(arr_t arr) noexcept -> FixedStr<32> {
     return res;
 }
 
+static fn make_dims_list(u32 rank, const u64 dims[]) -> FixedList<u64, 8> {
+    mut dims_list = FixedList<u64, 8>();
+
+    for (mut i = 0u; i < rank; ++i) {
+        dims_list.push(dims[i]);
+    }
+
+    return dims_list;
+}
+
+static fn get_total_cnt(u32 rank, const u64 dims[]) -> u64 {
+    mut total_cnt = u64(1);
+
+    for (mut i = 0u; i < rank; ++i) {
+        total_cnt *= dims[i];
+    }
+
+    return total_cnt;
+}
 #pragma region context
 
 class Context
@@ -175,17 +194,16 @@ pub fn to_str(Error err_id) noexcept -> str {
     return err_name;
 }
 
-pub fn _sync() noexcept -> Result<void> {
+pub fn _sync() noexcept -> void {
     static let cu_ctx_sync = get_fn<Error()>("cuCtxSynchronize");
 
     mut eid = cu_ctx_sync();
     if (eid != Error::Success) {
-        log::error("ustd::cuda::sync(): err = {}", eid);
-        return Result<void>::Err(eid);
+        log::error("ustd::cuda::sync() -> Error({})", eid);
+        return;
     }
 
-    log::info("ustd::cuda::sync(): success");
-    return Result<void>::Ok();
+    log::info("ustd::cuda::sync() -> Ok()");
 }
 #pragma endregion
 
@@ -205,90 +223,95 @@ pub fn set_stream(stream_t stream) noexcept -> void {
 #pragma endregion
 
 #pragma region memory
-pub fn _dnew(Type type, u64 count) noexcept -> Result<void*> {
+pub fn _dnew(Type type, u32 rank, const u64 dims[]) noexcept -> void* {
     static let cu_dev_malloc = get_fn<Error(void**, u64)>("cuMemAlloc_v2");
 
-    if (count == 0u) {
-        return Result<void*>::Ok(nullptr);
+    let dims_list = make_dims_list(rank, dims);
+    let total_cnt = get_total_cnt(rank, dims);
+
+    if (total_cnt == 0u) {
+        return nullptr;
     }
 
     mut ptr = static_cast<void*>(nullptr);
-    mut eid = cu_dev_malloc(&ptr, type._size*count);
+    mut eid = cu_dev_malloc(&ptr, type._size*total_cnt);
     if (eid != Error::Success) {
-        log::error("ustd::cuda::dnew<{}>(count={}) -> Error({})", type, count, eid);
-        return Result<void*>::Err(eid);
+        log::error("ustd::cuda::dnew<{}>(dims={}) -> Error({})", type, dims_list, eid);
+        return nullptr;
     }
 
-    log::info("ustd::cuda::dnew<{}>(count={}) -> Ok({})", type, count, ptr);
-    return Result<void*>::Ok(ptr);
+    log::info("ustd::cuda::dnew<{}>(dims={}) -> Ok({})", type, dims_list, ptr);
+    return ptr;
 }
 
-pub fn _ddel(Type type, void* ptr) noexcept -> Result<void> {
+pub fn _ddel(Type type, void* ptr) noexcept -> void {
     static let cu_dev_free = get_fn<Error(void*)>("cuMemFree_v2");
 
     if (ptr == nullptr) {
-        return Result<void>::Ok();
+        return;
     }
 
     let eid = cu_dev_free(ptr);
     if (eid != Error::Success) {
         log::error("ustd::cuda::ddel<{}>(ptr={}) -> Error({})", type, ptr, eid);
-        return Result<void>::Err(eid);
+        return;
     }
     log::info("ustd::cuda::ddel<{}>(ptr={}) -> Ok()", type, ptr);
-
-    return Result<void>::Ok();
 }
 
-pub fn _hnew(Type type, u64 count) noexcept -> Result<void*> {
+pub fn _hnew(Type type, u32 rank, const u64 dims[]) noexcept -> void* {
     static let cu_host_malloc = get_fn<Error(void**, u64)>("cuMemAllocHost_v2");
 
-    if (count == 0u) {
-        return Result<void*>::Ok(nullptr);
+    let dims_list = make_dims_list(rank, dims);
+    let total_cnt = get_total_cnt(rank, dims);
+
+    if (total_cnt == 0u) {
+        return nullptr;
     }
 
     mut ptr = static_cast<void*>(nullptr);
-    let eid = cu_host_malloc(&ptr, type._size*count);
+    let eid = cu_host_malloc(&ptr, type._size*total_cnt);
     if (eid != Error::Success) {
-        log::error("ustd::cuda::hnew<{}>(count={}) -> Error({})", type, count, eid);
-        return Result<void*>::Err(eid);
+        log::error("ustd::cuda::hnew<{}>(dims={}) -> Error({})", type, dims_list, eid);
+        return nullptr;
     }
-    log::info("ustd::cuda::hnew<{}>(count={}): Ok({})", type, count, ptr);
+    log::info("ustd::cuda::hnew<{}>(dims={}): Ok({})", type, dims_list, ptr);
 
-    return Result<void*>::Ok(ptr);
+    return ptr;
 }
 
-pub fn _hdel(Type type, void* ptr) noexcept -> Result<void> {
+pub fn _hdel(Type type, void* ptr) noexcept -> void {
     static let cu_host_free = get_fn<Error(void*)>("cuMemFreeHost");
 
     if (ptr == nullptr) {
-        return Result<void>::Ok();
+        return;
     }
 
     let eid = cu_host_free(ptr);
     if (eid != Error::Success) {
         log::error("ustd::cuda::hdel<{}>(ptr={}) -> Error({})", type, ptr, eid);
-        return Result<void>::Err(eid);
+        return;
     }
     log::info("ustd::cuda::hdel<{}>(ptr={}) -> Ok()", type, ptr);
-    return Result<void>::Ok();
 }
 
-pub fn _mcpy(Type type, void* dst, const void* src, u64 count) noexcept -> Result<void> {
+pub fn _mcpy(Type type, void* dst, const void* src, u32 rank, const u64 dims[]) noexcept -> void {
     static let cu_memcpy = get_fn<Error(void* dst, const void* src, u64 size)>("cuMemcpy");
 
-    if (count == 0u) {
-        return Result<void>::Ok();
+    let dims_list = make_dims_list(rank, dims);
+    let total_cnt = get_total_cnt(rank, dims);
+
+    if (total_cnt == 0u) {
+        return;
     }
 
-    let eid = cu_memcpy(dst, src, type._size*count);
+    let eid = cu_memcpy(dst, src, type._size*total_cnt);
 
     if (eid != Error::Success) {
-        log::error("ustd::cuda::mcpy<{}>(dst={}, src={}, count={}) -> Error({})", type, dst, src, count, eid);
-        return Result<void>::Err(eid);
+        log::error("ustd::cuda::mcpy<{}>(dst={}, src={}, dims={}) -> Error({})", type, dst, src, dims_list, eid);
+        return;
     }
-    log::info("ustd::cuda::mcpy<{}>(dst={}, src={}, count={}) -> Ok()", type, dst, src, count);
-    return Result<void>::Ok();
+    log::info("ustd::cuda::mcpy<{}>(dst={}, src={}, dims={}) -> Ok()", type, dst, src, dims_list);
 }
 
 #pragma endregion
@@ -367,11 +390,11 @@ static fn arr_get_desc(arr_t arr) -> Result<arr_desc_t> {
     return Result<arr_desc_t>::Ok(desc);
 }
 
-pub fn _anew(Type type, u32 rank, const u32 dims[]) noexcept -> Result<arr_t> {
+pub fn _anew(Type type, u32 rank, const u64 dims[]) noexcept -> arr_t {
     static let cu_array_create = get_fn<Error(arr_t*, const arr_desc_t*)>("cuArray3DCreate_v2");
 
     if (rank == 0 || dims[0] == 0) {
-        return Result<arr_t>::Ok(arr_t(0));
+        return arr_t(0);
     }
 
     let fmt = get_array_fmt(type);
@@ -390,72 +413,71 @@ pub fn _anew(Type type, u32 rank, const u32 dims[]) noexcept -> Result<arr_t> {
 
     mut dims_list = FixedList<u32, 3>();
     for (mut i = 0u; i < rank; ++i) {
-        dims_list.push(dims[i]);
+        dims_list.push(u32(dims[i]));
     }
     if (eid != Error::Success) {
         log::error("ustd::cuda::anew<{}>(dims={}) -> Error({})", type, dims_list, eid);
-        return Result<arr_t>::Err(eid);
+        return arr_t(0);
     }
     log::info("ustd::cuda::anew<{}>(dims={}) -> Ok({})", type, dims_list, res);
 
-    return Result<arr_t>::Ok(res);
+    return res;
 }
 
-pub fn _adel(Type type, arr_t arr) noexcept -> Result<void> {
+pub fn _adel(Type type, arr_t arr) noexcept -> void {
     static let cu_array_destroy = get_fn<Error(arr_t)>("cuArrayDestroy");
 
     if (arr == arr_t(0)) {
-        return Result<void>::Ok();
+        return;
     }
 
     mut eid = cu_array_destroy(arr);
     if (eid != Error::Success) {
         log::error("ustd::cuda::adel<{}>(arr={}) -> Error({})", type, arr, eid);
-        return Result<void>::Err(eid);
+        return;
     }
 
     log::info("ustd::cuda::adel<{}>(arr={}) -> Ok()", type, arr);
-    return Result<void>::Ok();
 }
 
 struct mcpy_params_t {
-    u64       src_x           = 0;
-    u64       src_y           = 0;
-    u64       src_z           = 0;
-    u64       src_lod         = 0;
+    u64         src_x           = 0;
+    u64         src_y           = 0;
+    u64         src_z           = 0;
+    u64         src_lod         = 0;
     MemoryType  src_type        = MemoryType::Unified;
     const void* src_host        = nullptr;
     const void* src_device      = nullptr;
     arr_t       src_array       = arr_t(0);
     void*       src_reserved    = nullptr;
-    u64       src_pitch       = 0;
-    u64       src_height      = 0;
+    u64         src_pitch       = 0;
+    u64         src_height      = 0;
 
-    u64       dst_x           = 0;
-    u64       dst_y           = 0;
-    u64       dst_z           = 0;
-    u64       dst_lod         = 0;
+    u64         dst_x           = 0;
+    u64         dst_y           = 0;
+    u64         dst_z           = 0;
+    u64         dst_lod         = 0;
     MemoryType  dst_type        = MemoryType::Unified;
     const void* dst_host        = nullptr;
     const void* dst_device      = nullptr;
     arr_t       dst_array       = arr_t(0);
     void*       dst_reserved    = nullptr;
-    u64       dst_pitch       = 0;
-    u64       dst_height      = 0;
+    u64         dst_pitch       = 0;
+    u64         dst_height      = 0;
 
-    u64       width           = 0;
-    u64       height          = 0;
-    u64       depth           = 0;
+    u64         width           = 0;
+    u64         height          = 0;
+    u64         depth           = 0;
 };
 
 // ptr->arr
-pub fn _acpy(Type type, arr_t dst, const void* src, u32 rank, const u32 dims[]) noexcept -> Result<void> {
+pub fn _acpy(Type type, arr_t dst, const void* src, u32 rank, const u64 dims[]) noexcept -> void {
     static let cu_memcpy = get_fn<Error(const mcpy_params_t*)>("cuMemcpy3D_v2");
 
     // dims
     mut dims_list = FixedList<u32, 3>();
     for (mut i = 0u; i < dims_list._capacity; ++i) {
-        let val = i < rank ? dims[i] : 1;
+        let val = i < rank ? u32(dims[i]) : 1u;
         dims_list.push(val);
     }
 
@@ -477,21 +499,20 @@ pub fn _acpy(Type type, arr_t dst, const void* src, u32 rank, const u32 dims[]) 
     // log message
     if (eid != Error::Success) {
         log::error("ustd::cuda::acpy(dst=arr:{}, src={}:{}, dims={}) -> Error({})", dst, type, src, dims_list, eid);
-        return Result<void>::Err(eid);
+        return;
     }
 
     log::info("ustd::cuda::acpy(dst=arr:{}, src={}:{}, dims={}) -> Ok()", dst, type, src, dims_list);
-    return Result<void>::Ok();
 }
 
 // arr->ptr
-pub fn _acpy(Type type, void* dst, arr_t src, u32 rank, const u32 dims[]) noexcept -> Result<void> {
+pub fn _acpy(Type type, void* dst, arr_t src, u32 rank, const u64 dims[]) noexcept -> void {
     static let cu_memcpy = get_fn<Error(const mcpy_params_t*)>("cuMemcpy3D_v2");
 
     // dims
     mut dims_list = FixedList<u32, 3>();
     for (mut i = 0u; i < dims_list._capacity; ++i) {
-        let val = i < rank ? dims[i] : 1;
+        let val = i < rank ? u32(dims[i]) : 1u;
         dims_list.push(val);
     }
 
@@ -513,11 +534,10 @@ pub fn _acpy(Type type, void* dst, arr_t src, u32 rank, const u32 dims[]) noexce
     // log message
     if (eid != Error::Success) {
         log::error("ustd::cuda::acpy(dst={}:{}, src=arr:{}, dims={}) -> Error({})", type, dst, src, dims_list, eid);
-        return Result<void>::Err(eid);
+        return;
     }
 
     log::info("ustd::cuda::acpy(dst={}:{}, src=arr:{}, dims={}) -> Ok() ", type, dst, src, dims_list);
-    return Result<void>::Ok();
 }
 
 #pragma endregion
@@ -578,7 +598,7 @@ static fn get_res_format(arr_fmt_t type, u32 n) -> u32 {
     return 0x00;
 }
 
-pub fn _tnew(Type type, arr_t arr, TexAddress address_mode, TexFilter filter_mode) noexcept -> Result<tex_t> {
+pub fn _tnew(Type type, arr_t arr, TexAddress address_mode, TexFilter filter_mode) noexcept -> tex_t {
     static let cu_tex_create = get_fn<Error(tex_t*, res_desc_t*, tex_desc_t*, res_view_t*)>("cuTexObjectCreate");
 
     mut tex = tex_t(0);
@@ -598,7 +618,8 @@ pub fn _tnew(Type type, arr_t arr, TexAddress address_mode, TexFilter filter_mod
     // arr desc
     let arr_desc_opt = arr_get_desc(arr);
     if (arr_desc_opt.is_err()) {
-        return Result<tex_t>::Err(arr_desc_opt._err);
+        log::error("ustd::cuda::tnew<{}>(...) -> Error({})", type, "InvalidData");
+        return tex_t(0);
     }
     let& arr_desc = arr_desc_opt._ok;
 
@@ -612,22 +633,21 @@ pub fn _tnew(Type type, arr_t arr, TexAddress address_mode, TexFilter filter_mod
     let tex_eid = cu_tex_create(&tex, &res_desc, &tex_desc, &res_view);
     if (tex_eid != Error::Success) {
         log::error("ustd::cuda::tnew<{}>(...) -> Error({})", type, tex_eid);
-        return Result<tex_t>::Err(tex_eid);
+        return tex_t(tex_eid);
     }
     log::info("ustd::cuda::tnew<{}>(...) -> Ok({})", type, u32(tex));
 
-    return Result<tex_t>::Ok(tex);
+    return tex_t(tex_eid);
 }
 
-pub fn _tdel(Type type, tex_t tex) noexcept -> Result<void> {
+pub fn _tdel(Type type, tex_t tex) noexcept -> void {
     static let cu_tex_destroy = get_fn<Error(tex_t)>("cuTexObjectDestroy");
     let eid = cu_tex_destroy(tex);
     if (eid != Error::Success) {
         log::error("ustd::cuda::tdel<{}>(tex={}) -> Error({})", type, u32(tex), eid);
-        return Result<void>::Err(eid);
+        return;
     }
     log::info("ustd::cuda::tdel<{}>(tex={}) -> Ok()", type, u32(tex));
-    return Result<void>::Ok();
 }
 
 #pragma endregion
@@ -638,14 +658,14 @@ namespace ustd::cuda
 {
 
 unittest(mem) {
-    mut h0 = math::NDArray<f32, 2>({256, 256});
+    mut h0 = math::NDArray<f32, 2>::with_dims({256, 256});
     h0 <<= math::vline(1.0f, 0.1f);
     assert_eq(h0(1, 1), 1.1f);
 
-    mut d0 = cuda::NDArray<f32, 2>({256, 256});
+    mut d0 = cuda::NDArray<f32, 2>::with_dims({256, 256});
     d0 <<= h0;
 
-    mut h1 = math::NDArray<f32, 2>({ 256, 256 });
+    mut h1 = math::NDArray<f32, 2>::with_dims({ 256, 256 });
     h1 <<= d0;
 
     assert_eq(h1(1, 1), 1.1f);

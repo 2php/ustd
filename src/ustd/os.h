@@ -22,9 +22,4 @@ using namespace linux;
 using namespace macos;
 #endif
 
-#if defined(__unix) || defined(__linux) || defined(__linux__) || defined(__APPLE__)
-#define USTD_OS_UNIX
-using namespace unix;
-#endif
-
 }

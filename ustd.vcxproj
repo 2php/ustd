@@ -116,7 +116,7 @@
     <ClInclude Include="src\ustd\core\list.h" />
     <ClInclude Include="src\ustd\cuda.h" />
     <ClInclude Include="src\ustd\cuda\api.h" />
-    <ClInclude Include="src\ustd\cuda\array.h" />
+    <ClInclude Include="src\ustd\cuda\ndarray.h" />
     <ClInclude Include="src\ustd\cuda\kernel.h" />
     <ClInclude Include="src\ustd\cuda\tex.h" />
     <ClInclude Include="src\ustd\env.h" />
@@ -137,9 +137,9 @@
     <ClInclude Include="src\ustd\math\ndslice.h" />
     <ClInclude Include="src\ustd\math\vfun.h" />
     <ClInclude Include="src\ustd\os.h" />
-    <ClInclude Include="src\ustd\os\posix.h" />
-    <ClInclude Include="src\ustd\os\unix.h" />
-    <ClInclude Include="src\ustd\os\windows.h" />
+    <ClInclude Include="src\ustd\os\os_posix.h" />
+    <ClInclude Include="src\ustd\os\os_unix.h" />
+    <ClInclude Include="src\ustd\os\os_win32.h" />
     <ClInclude Include="src\ustd\serialization.h" />
     <ClInclude Include="src\ustd\serialization\dom.h" />
     <ClInclude Include="src\ustd\serialization\func.h" />
@@ -192,14 +192,23 @@
     <ClCompile Include="src\ustd\math\ndarray.cc" />
     <ClCompile Include="src\ustd\math\mkl.cc" />
     <ClCompile Include="src\ustd\math\vfun.cc" />
-    <ClCompile Include="src\ustd\os\posix.cc" />
-    <ClCompile Include="src\ustd\os\windows.cc" />
+    <ClCompile Include="src\ustd\os\os_posix.cc" />
+    <ClCompile Include="src\ustd\os\os_unix.cc" />
+    <ClCompile Include="src\ustd\os\os_win32.cc" />
     <ClCompile Include="src\ustd\serialization\dom.cc" />
     <ClCompile Include="src\ustd\serialization\func.cc" />
     <ClCompile Include="src\ustd\serialization\json.cc" />
     <ClCompile Include="src\ustd\serialization\xml.cc" />
-    <ClCompile Include="src\ustd\sync\condvar.cc" />
-    <ClCompile Include="src\ustd\sync\mutex.cc" />
+    <ClCompile Include="src\ustd\sync\condvar_pthread.cc">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="src\ustd\sync\condvar_win32.cc" />
+    <ClCompile Include="src\ustd\sync\mutex_pthread.cc">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="src\ustd\sync\mutex_win32.cc" />
     <ClCompile Include="src\ustd\task\scheduler.cc" />
     <ClCompile Include="src\ustd\task\task.cc" />
     <ClCompile Include="src\ustd\test\scheduler.cc" />
@@ -207,11 +216,11 @@
     <ClCompile Include="src\ustd\thread\funcs.cc" />
     <ClCompile Include="src\ustd\core\fmt.cc" />
     <ClCompile Include="src\ustd\thread\thread.cc" />
-    <ClCompile Include="src\ustd\thread\thread_windows.cc" />
-    <ClCompile Include="src\ustd\thread\thread_unix.cc">
+    <ClCompile Include="src\ustd\thread\thread_pthread.cc">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="src\ustd\thread\thread_win32.cc" />
     <ClCompile Include="src\ustd\time\time.cc" />
   </ItemGroup>
   <ItemGroup>
@@ -271,6 +280,7 @@
       <Link>vcruntime140d.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="xmake.lua" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />

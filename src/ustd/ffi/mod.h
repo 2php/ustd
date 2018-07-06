@@ -16,9 +16,9 @@ enum fun_t : u64 { };
 
 class Mod final
 {
-    mod_t _mod;
-
 public:
+    mod_t   _mod;
+
     pub ~Mod() noexcept;
 
     Mod(Mod&& other) noexcept: _mod(other._mod) {

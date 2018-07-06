@@ -230,23 +230,35 @@ struct Dom
     }
 
 #pragma region properties
-    /* property: node */
-    __declspec(property(get = get_node, put = set_node)) Node node;
-    fn get_node() const     noexcept -> const Node& { return _nodes[_index]; }
-    fn get_node()           noexcept -> Node&       { return _nodes[_index]; }
-    fn set_node(Node val)   noexcept -> void        { _nodes[_index] = val;  }
+    fn node() const noexcept -> const Node& {
+        return _nodes[_index];
+    }
 
-    /* property: type */
-    __declspec(property(get = get_type)) Type type;
-    fn get_type() const noexcept -> Type { return node._type; }
+    fn node() noexcept -> Node& {
+        return _nodes[_index];
+    }
 
-    /* property: len */
-    __declspec(property(get = get_len)) u32 len;
-    fn get_len() const noexcept -> u32 { return node._size; }
+    fn set_node(Node val)   noexcept -> void {
+        _nodes[_index] = val;
+    }
 
-    /* property: key */
-    __declspec(property(get = get_key)) Option<str> key;
-    fn get_key() const noexcept -> Option<str> { 
+    fn type() const noexcept -> Type {
+        return _nodes[_index]._type;
+    }
+
+    fn len() const noexcept -> u32 {
+        return _nodes[_index]._size;
+    }
+
+    fn size() const noexcept -> u32 {
+        return _nodes[_index]._size;
+    }
+
+    fn next() const noexcept -> u32 {
+        return _nodes[_index]._next;
+    }
+
+    fn key() const noexcept -> Option<str> { 
         let key_node = _nodes[_index - 1]; 
         if (key_node._type != Type::$key) return Option<str>::None();
         return Option<str>::Some(key_node._str, key_node._size);
@@ -328,8 +340,8 @@ public:
 
 protected:
     Tree(u32 capacity) noexcept
-        : Dom{ _vec, 0 }
-        , _vec{ List<Node>::with_capacity(capacity) }
+        : Dom(_vec, 0)
+        , _vec(List<Node>::with_capacity(capacity))
     {
         _vec.push(Node::from_null());
     }

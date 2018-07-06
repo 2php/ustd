@@ -13,7 +13,7 @@ public:
     {}
 
     fn head(const Dom& dom) -> void {
-        let node = dom.node;
+        let node = dom.node();
 
         _fmt.push_str("<xml? version=\"1.0\" encoding=\"utf-8\" ?>\n");
         sformat(_fmt._outbuf, "<root size={}>", node._size);
@@ -24,9 +24,10 @@ public:
     }
 
     fn do_fmt(const Dom& dom) -> void {
-        let node = dom.node;
+        let node = dom.node();
+        let type = dom.type();
 
-        switch (node._type) {
+        switch (type) {
             case Type::$null:   _fmt("");           break;
             case Type::$bool:   _fmt(node._bool);   break;
             case Type::$u8:     _fmt(node._u8);    break;
@@ -68,18 +69,18 @@ public:
                 let cnt = node._size;
                 mut val = Dom{ dom._nodes, dom._index + 1 };
 
-                for (mut idx = 0u; idx < cnt; ++idx, val._index += val.node._next) {
+                for (mut idx = 0u; idx < cnt; ++idx, val._index += val.node()._next) {
                     _fmt.indent();
 
-                    if (val.node._type == Type::$array || val.node._type == Type::$object) {
-                        sformat(_fmt._outbuf, "<item type=\"{}\", size={}>", to_str(val.node._type), val.node._size);
+                    if (val.type() == Type::$array || val.type() == Type::$object) {
+                        sformat(_fmt._outbuf, "<item type=\"{}\", size={}>", to_str(val.type()), val.len());
                     }
                     else {
-                        sformat(_fmt._outbuf, "<item type=\"{}\">", to_str(val.node._type));
+                        sformat(_fmt._outbuf, "<item type=\"{}\">", to_str(val.type()));
                     }
                     do_fmt(val);
 
-                    if (val.node._type == Type::$array || val.node._type == Type::$object) {
+                    if (val.type() == Type::$array || val.type() == Type::$object) {
                         _fmt.indent();
                     }
                     _fmt.push_str("</item>\n");
@@ -99,16 +100,16 @@ public:
                 mut key = Dom{ dom._nodes, dom._index + 1 };
                 mut val = Dom{ dom._nodes, dom._index + 2 };
 
-                for (u32 idx = 0u; idx < cnt; ++idx, key._index += key.node._next, val._index += val.node._next) {
+                for (u32 idx = 0u; idx < cnt; ++idx, key._index += key.next(), val._index += val.next()) {
                     _fmt.indent();
 
-                    sformat(_fmt._outbuf, "<{} type=\"{}\">", str{ key.node._str, key.node._size }, to_str(val.node._type));
+                    sformat(_fmt._outbuf, "<{} type=\"{}\">", str{ key.node()._str, key.node()._size }, to_str(val.type()));
                     do_fmt(val);
 
-                    if (val.node._type == Type::$array || val.node._type == Type::$object) {
+                    if (val.type() == Type::$array || val.type() == Type::$object) {
                         _fmt.indent();
                     }
-                    sformat(_fmt._outbuf, "</{}>\n", str{ key.node._str, key.node._size });
+                    sformat(_fmt._outbuf, "</{}>\n", str{ key.node()._str, key.node()._size });
                 }
 
                 _fmt._indent -= 1;

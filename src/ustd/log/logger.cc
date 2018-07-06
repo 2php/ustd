@@ -6,39 +6,43 @@ namespace ustd::log
 using namespace io;
 
 pub fn to_str(Level level) noexcept -> str {
+    mut res = str();
     switch (level) {
-        case Trace: return "trace";
-        case Debug: return "debug";
-        case Info:  return "info";
-        case Warn:  return "warn";
-        case Error: return "error";
-        case Fatal: return "fatal";
+        case Trace: res = "trace";  break;
+        case Debug: res = "debug";  break;
+        case Info:  res = "info";   break;
+        case Warn:  res = "warn";   break;
+        case Error: res = "error";  break;
+        case Fatal: res = "fatal";  break;
     }
-    return str();
+    return res;
 }
 
 static fn to_sgr(Level level) noexcept -> io::SGR {
+    mut res = SGR::RST;
     switch (level) {
-        case Trace: return SGR::FG_DEF;
-        case Debug: return SGR::FG_GRN;
-        case Info:  return SGR::FG_CYN;
-        case Warn:  return SGR::FG_YEL;
-        case Error: return SGR::FG_RED;
-        case Fatal: return SGR::BG_RED;
+        case Trace: res = SGR::FG_DEF; break;
+        case Debug: res = SGR::FG_GRN; break;
+        case Info:  res = SGR::FG_CYN; break;
+        case Warn:  res = SGR::FG_YEL; break;
+        case Error: res = SGR::FG_RED; break;
+        case Fatal: res = SGR::BG_RED; break;
     }
     return SGR::RST;
 }
 
 static fn to_title(Level level) noexcept -> str {
+    mut res = str();
     switch (level) {
-        case Trace: return "--";
-        case Debug: return "**";
-        case Info:  return "::";
-        case Warn:  return "??";
-        case Error: return "!!";
-        case Fatal: return "xx";
+        case Trace: res = "--"; break;
+        case Debug: res = "**"; break;
+        case Info:  res = "::"; break;
+        case Warn:  res = "??"; break;
+        case Error: res = "!!"; break;
+        case Fatal: res = "xx"; break;
+        default:    res = "  "; break;
     }
-    return "  ";
+    return res;;
 }
 
 pub Logger::Logger() noexcept

@@ -4,52 +4,34 @@
 namespace ustd::os
 {
 
-pub fn get_error() noexcept -> Error {
-    let eid = errno;
-
-    if (eid == 0) {
-        return Error::Success;
-    }
-
-    switch (eid) {
-        case EBADF      :
-        case ENXIO      :
-        case EOVERFLOW  :
-        case EINVAL     : return Error::InvalidInput;
-        case EACCES     : return Error::PermissionDenied;
-        case ENOENT     : return Error::NotFound;
-        case EEXIST     : return Error::AlreadyExists;
-        case EINTR      : return Error::Interrupted;
-        default         : return Error::Other;
-    }
-}
-
 pub fn to_str(Error e) noexcept -> str {
     using namespace os;
 
+    mut res = str("Unknown");
+
     switch(e) {
-      case os::Error::Success            : return "Success";
-      case os::Error::NotFound           : return "NotFound";
-      case os::Error::PermissionDenied   : return "PermissionDenied";
-      case os::Error::ConnectionRefused  : return "ConnectionRefused";
-      case os::Error::ConnectionReset    : return "ConnectionReset";
-      case os::Error::ConnectionAborted  : return "ConnectionAborted";
-      case os::Error::NotConnected       : return "NotConnected";
-      case os::Error::AddrInUse          : return "AddrInUse";
-      case os::Error::AddrNotAvailable   : return "AddrNotAvailable";
-      case os::Error::BrokenPipe         : return "BrokenPipe";
-      case os::Error::AlreadyExists      : return "AlreadyExists";
-      case os::Error::WouldBlock         : return "WouldBlock";
-      case os::Error::InvalidInput       : return "InvalidInput";
-      case os::Error::InvalidData        : return "InvalidData";
-      case os::Error::TimedOut           : return "TimedOut";
-      case os::Error::WriteZero          : return "WriteZero";
-      case os::Error::Interrupted        : return "Interrupted";
-      case os::Error::UnexpectedEof      : return "UnexpectedEof";
-      case os::Error::Other              : return "Other";
+      case Error::Success            : res = "Success";             break;
+      case Error::NotFound           : res = "NotFound";            break;
+      case Error::PermissionDenied   : res = "PermissionDenied";    break;
+      case Error::ConnectionRefused  : res = "ConnectionRefused";   break;
+      case Error::ConnectionReset    : res = "ConnectionReset";     break;
+      case Error::ConnectionAborted  : res = "ConnectionAborted";   break;
+      case Error::NotConnected       : res = "NotConnected";        break;
+      case Error::AddrInUse          : res = "AddrInUse";           break;
+      case Error::AddrNotAvailable   : res = "AddrNotAvailable";    break;
+      case Error::BrokenPipe         : res = "BrokenPipe";          break;
+      case Error::AlreadyExists      : res = "AlreadyExists";       break;
+      case Error::WouldBlock         : res = "WouldBlock";          break;
+      case Error::InvalidInput       : res = "InvalidInput";        break;
+      case Error::InvalidData        : res = "InvalidData";         break;
+      case Error::TimedOut           : res = "TimedOut";            break;
+      case Error::WriteZero          : res = "WriteZero";           break;
+      case Error::Interrupted        : res = "Interrupted";         break;
+      case Error::UnexpectedEof      : res = "UnexpectedEof";       break;
+      case Error::Other              : res = "Other";               break;
     }
 
-    return "Unknown";
+    return res;
 }
 
 }

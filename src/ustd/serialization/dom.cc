@@ -54,28 +54,28 @@ pub fn Dom::Iter::next() noexcept -> Option<Dom> {
 #pragma region DOM
 
 pub fn Dom::operator[](u32 idx) noexcept -> Result<Dom> {
-    if (Type::$array != node._type) return Result<Dom>::Err(Error::UnexpectType);
-    if (idx >= node._size) return Result<Dom>::Err(Error::OutOfRange);
+    if (Type::$array != node()._type) return Result<Dom>::Err(Error::UnexpectType);
+    if (idx >= node()._size) return Result<Dom>::Err(Error::OutOfRange);
 
     mut val = *this;
     val._index += 1;
     for (mut i = 0u; i < idx; ++i) {
-        val._index += val.node._next;
+        val._index += val.node()._next;
     }
 
     return Result<Dom>::Ok(val);
 }
 
 pub fn Dom::operator[](str name) noexcept -> Result<Dom> {
-    if (Type::$object != node._type) {
+    if (Type::$object != node()._type) {
         return Result<Dom>::Err(Error::UnexpectType);
     }
 
-    let obj_cnt = node._size;
+    let obj_cnt = node()._size;
     mut val_dom = Dom(_nodes, _index + 2);
 
     for (mut i = 0u; i < obj_cnt; ++i) {
-        let key_opt = val_dom.key;
+        let key_opt = val_dom.key();
         if (key_opt.is_none()) {
             return Result<Dom>::Err(Error::UnexpectType);
         }
@@ -85,7 +85,7 @@ pub fn Dom::operator[](str name) noexcept -> Result<Dom> {
             return Result<Dom>::Ok(val_dom);
         }
 
-        val_dom._index += val_dom.node._next;
+        val_dom._index += val_dom.node()._next;
     }
 
     return Result<Dom>::Err(Error::KeyNotFound);

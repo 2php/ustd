@@ -20,58 +20,50 @@ fn mcpy(T* dst, const T* src, u64 size) -> void;
 template<typename T>
 struct Slice
 {
-    using type_t    = T;
-    using const_t   = ustd::const_t<type_t>;
-    using ref_t     = ustd::ref_t<type_t>;
-    using cref_t    = ustd::const_t<ref_t>;
-
-    using size_t    = u32;
-    using offset_t  = i32;
-
-    type_t* _data       = nullptr;
-    size_t  _size       = 0;
-    size_t  _capacity   = 0;
+    T* _data       = nullptr;
+    u32 _size       = 0;
+    u32 _capacity   = 0;
 
 #pragma region ctor
     // ctor:
     constexpr Slice() noexcept = default;
 
     // ctor:
-    constexpr Slice(T* ptr, size_t length, size_t capacity = 0)
+    constexpr Slice(T* ptr, u32 length, u32 capacity = 0)
         : _data{ ptr }, _size{ length }, _capacity{ capacity }
     {}
 
     // ctor:
-    template<size_t N>
+    template<u32 N>
     constexpr Slice(const T(&s)[N])
-        : Slice{ s, $is_same<const_t, const char> ? N - 1 : N }
+        : Slice{ s, $is_same<T, const char> ? N - 1 : N }
     {}
 
     // convert: const
-    constexpr operator Slice<const_t>() const noexcept {
+    constexpr operator Slice<const T>() const noexcept {
         return { _data, _size, _capacity };
     }
 
 #pragma endregion
 
 #pragma region property
-    fn data() const noexcept -> type_t* {
+    fn data() const noexcept -> T* {
         return _data;
     }
 
-    fn len() const noexcept -> size_t {
+    fn len() const noexcept -> u32 {
         return _size;
     }
 
-    fn size() const noexcept -> size_t {
+    fn size() const noexcept -> u32 {
         return _size;
     }
 
-    fn count() const noexcept -> size_t {
+    fn count() const noexcept -> u32 {
         return _size;
     }
 
-    fn capacity() const noexcept -> size_t {
+    fn capacity() const noexcept -> u32 {
         return _capacity;
     }
 
@@ -86,12 +78,12 @@ struct Slice
 
 #pragma region access
     // operator: []
-    fn operator[](size_t i) const noexcept -> cref_t {
+    fn operator[](u32 i) const noexcept -> const T& {
         return _data[i];
     }
 
     // operator: []
-    fn operator[](size_t i) noexcept -> ref_t {
+    fn operator[](u32 i) noexcept -> T& {
         return _data[i];
     }
 #pragma endregion
@@ -99,51 +91,49 @@ struct Slice
 #pragma region method
 
     // method: slice
-    fn slice(size_t beg, size_t end) const noexcept-> Slice {
+    fn slice(u32 beg, u32 end) const noexcept-> Slice {
         return { _data + beg, end - beg + 1 };
     }
 
-    fn slice(offset_t beg, offset_t end) const noexcept -> Slice {
-        let beg_pos = size_t(beg + offset_t(_size)) % _size;
-        let end_pos = size_t(end + offset_t(_size)) % _size;
+    fn slice(i32 beg, i32 end) const noexcept -> Slice {
+        let beg_pos = u32(beg + i32(_size)) % _size;
+        let end_pos = u32(end + i32(_size)) % _size;
         return { _data + beg_pos, end_pos - beg_pos + 1 };
     }
 
     // method: clear
     fn clear() noexcept -> void {
-        let size = _size;
+        let cnt = _size;
+        _size   = 0;
 
         if (!trivial<T>::$dtor) {
-            for (mut i = 0u; i < size; ++i) {
-                _data[i].~T();
+            for (mut i = 0u; i < cnt; ++i) {
+                ustd::dtor(&_data[i]);
             }
         }
-
-        _size = 0;
     }
 
     // operator: eq
-    template<class U>
-    fn operator==(Slice<U> other) const noexcept -> bool {
+    fn operator==(Slice<const T> other) const noexcept -> bool {
         if (_size != other._size) return false;
         if (_data == other._data) return true;
 
-        for (u32 i = 0; i < _size; ++i) {
-            if (_data[i] != other._data[i]) return false;
+        for (mut i = 0u; i < _size; ++i) {
+            if (_data[i] != other._data[i]) {
+                return false;
+            }
         }
         return true;
     }
 
     // operator: neq
-    template<class U>
-    fn operator!=(Slice<U> other) const noexcept -> bool {
+    fn operator!=(Slice<const T> other) const noexcept -> bool {
         let is_eq = (*this == other);
         return !is_eq;
     }
 
     // method: starts_with
-    template<class U>
-    fn starts_with(Slice<U> prefix) const noexcept -> bool {
+    fn starts_with(Slice<const T> prefix) const noexcept -> bool {
         if (prefix._size > _size) {
             return false;
         }
@@ -180,7 +170,7 @@ struct Slice
         let cnt = _size;
         for (mut i = 0u; i < cnt; ++i) {
             if (_data[i] == from) {
-                new(&_data[i])T(as_fwd<U>(u)...);
+                ustd::ctor(&_data[i], as_fwd<U>(u)...);
             }
         }
     }
@@ -213,11 +203,11 @@ struct Slice
 
 #pragma region iter
     // iter:
-    fn into_iter() const noexcept -> Iter<const_t> {
+    fn into_iter() const noexcept -> Iter<const_t<T>> {
         return { _data, _size };
     }
 
-    fn into_iter() noexcept -> Iter<type_t> {
+    fn into_iter() noexcept -> Iter<T> {
         return { _data, _size };
     }
 #pragma endregion

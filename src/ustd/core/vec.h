@@ -13,6 +13,11 @@ struct vec
 
     vec() noexcept = default;
 
+    template<u32 ...I, class V>
+    vec(immut_t<u32, I...>, const V& v) noexcept
+        : _arr{ T(v[I])... }
+    {}
+
     vec(const T(&arr)[N]) noexcept : vec(seq_t<N>{}, arr)
     {}
 
@@ -27,13 +32,6 @@ struct vec
 
     fn operator[](u32 idx)       noexcept ->       T& { return _arr[idx]; }
     fn operator[](u32 idx) const noexcept -> const T& { return _arr[idx]; }
-
-private:
-    template<u32 ...I>
-    vec(immut_t<u32, I...>, const T(&arr)[N]) noexcept
-        : _arr{ arr[I]... }
-    {}
-
 };
 
 template<typename T>
@@ -47,6 +45,11 @@ struct vec<T,2>
 
     vec() noexcept = default;
 
+    template<u32 ...I, class V>
+    vec(immut_t<u32, I...>, const V& v) noexcept
+        : _arr{ T(v[I])... }
+    {}
+
     vec(const T(&arr)[$rank]) noexcept : vec(seq_t<$rank>{}, arr)
     {}
 
@@ -61,13 +64,6 @@ struct vec<T,2>
 
     fn operator[](u32 idx)       noexcept ->       T& { return _arr[idx]; }
     fn operator[](u32 idx) const noexcept -> const T& { return _arr[idx]; }
-
-private:
-    template<u32 ...I>
-    vec(immut_t<u32, I...>, const T(&arr)[$rank]) noexcept
-        : _arr{ arr[I]... }
-    {}
-
 };
 
 template<typename T>
@@ -81,6 +77,11 @@ struct vec<T, 3>
 
     vec() noexcept = default;
 
+    template<u32 ...I, class V>
+    vec(immut_t<u32, I...>, const V& v) noexcept
+        : _arr{ T(v[I])... }
+    {}
+
     vec(const T(&arr)[$rank]) noexcept : vec(seq_t<$rank>{}, arr)
     {}
 
@@ -95,12 +96,6 @@ struct vec<T, 3>
 
     fn operator[](u32 idx)       noexcept ->       T& { return _arr[idx]; }
     fn operator[](u32 idx) const noexcept -> const T& { return _arr[idx]; }
-
-private:
-    template<u32 ...I>
-    vec(immut_t<u32, I...>, const T(&arr)[$rank]) noexcept
-        : _arr{ arr[I]... }
-    {}
 };
 
 template<typename T>
@@ -114,7 +109,12 @@ struct vec<T, 4>
 
     vec() noexcept = default;
 
-    vec(const T(&arr)[$rank]) noexcept : vec(seq_t<$rank>{}, arr)
+    template<u32 ...I, class V>
+    vec(immut_t<u32, I...>, const V& v) noexcept
+        : _arr{ T(v[I])... }
+    {}
+
+    vec(const T(&arr)[$rank]) noexcept : vec(seq_t<$rank>(), arr)
     {}
 
     template<class ...Us, class = when<1 + sizeof...(Us) == $rank> >
@@ -128,13 +128,12 @@ struct vec<T, 4>
 
     fn operator[](u32 idx)       noexcept ->       T& { return _arr[idx]; }
     fn operator[](u32 idx) const noexcept -> const T& { return _arr[idx]; }
-
-private:
-    template<u32 ...I>
-    vec(immut_t<u32, I...>, const T(&arr)[$rank]) noexcept
-        : _arr{ arr[I]... }
-    {}
 };
+
+template<class T, class F, u32 N>
+fn vec_cast(const vec<F,N>& src) noexcept -> vec<T,N> {
+    return vec<T, N>(seq_t<N>(), src._arr);
+}
 
 #define def_vec_bop(op, fun)                                                        \
 template<u32 ...I, class T, u32 N>                                                  \

@@ -4,10 +4,7 @@ namespace ustd
 {
 
 unittest(Tuple) {
-    Tuple<int, float> tp;
-    tp.$0 = 0;
-    tp.$1 = 1;
-
+    mut tp = Tuple<int, float>{ 0, 1 };
     log::info("tuple = {}", tp);
 }
 

@@ -1,20 +1,23 @@
 
--- add modes: debug and release 
+-- modes: debug and release 
 add_rules("mode.debug", "mode.release")
 
--- add target
-target(".")
+-- compiler: clang
+set_tools("cxx", "b:/LLVM/bin/clang++.exe")
+add_cxflags("-std=c++17", "-fms-extensions")
+add_includedirs("src/")
 
-    -- set kind
+target("ustd")
     set_kind("shared")
 
-    -- set language
-    add_cxflags("-std=c++17", "-fms-extensions")
-
-    -- set files
     add_files("src/**.cc") 
-    del_files("src/**_win32.cc")
+    del_files("src/**/main.cc")
+    del_files("src/**_unix.cc")
+    del_files("src/**_pthread.cc")
 
-    -- set includes
-    add_includedirs("src/")
 
+target("ustd.test")
+    set_kind("binary")
+    add_deps("ustd")
+
+    add_files("src/ustd/test/main.cc")

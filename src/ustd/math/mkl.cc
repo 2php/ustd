@@ -63,7 +63,7 @@ pub fn amax(vf64 x) noexcept-> u32 {
 
 unittest(amax)
 {
-    mut x = NDArray<f32, 1>({ 101 });
+    mut x = NDArray<f32, 1>::with_dims({ 101 });
 
     x <<= vline(1.0f);
     let i0 = amax(x);
@@ -90,7 +90,7 @@ pub fn amin(vf64 x) noexcept -> u32 {
 
 unittest(samin)
 {
-    mut x = NDArray<f32, 1>({ 101 });
+    mut x = NDArray<f32, 1>::with_dims({ 101 });
 
     x <<= vline(1.0f);
     let i0 = amin(x);
@@ -207,8 +207,8 @@ pub fn rot(vf64 x, vf64 y, f64x4 h) -> void {
 
 unittest(rot)
 {
-    mut x = NDArray<f32, 1>({ 64 });
-    mut y = NDArray<f32, 1>({ 64 });
+    mut x = NDArray<f32, 1>::with_dims({ 64 });
+    mut y = NDArray<f32, 1>::with_dims({ 64 });
     x <<= vline(1.0f);
     y <<= vline(0.1f);
 
@@ -365,8 +365,6 @@ class Contex
 
 };
 
-
 }
-
 
 }

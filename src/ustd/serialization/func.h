@@ -81,8 +81,8 @@ fn encode(Dom& dom, const T& val) noexcept -> Result<void> {
 #define ustd_encode_property(idx)                                                   \
         if constexpr(T::$property_cnt > idx) {                                      \
             let kv  = val.get_property(immut_t<u32, idx>());                        \
-            mut res = dom.obj_add_key_val(prev_key, kv.key, Node::from_null());     \
-            encode(res.$1, kv.val);                                                 \
+            mut res = dom.obj_add_key_val(prev_key, kv.key(), Node::from_null());   \
+            encode(res.$1, kv.val());                                               \
             prev_key = res.$0;                                                      \
         }
 
@@ -154,11 +154,11 @@ fn decode(Dom& dom, T& val) noexcept -> Result<void> {
 #define ustd_encode_property(idx)                                                   \
         if constexpr(T::$property_cnt > idx) {                                      \
             let kv          = val.get_property(immut_t<u32, idx>());                \
-            mut element_opt = dom[kv.key];                                          \
+            mut element_opt = dom[kv.key()];                                        \
             if (element_opt.is_err()) {                                             \
                 return Result<void>::Err(element_opt._err);                         \
             }                                                                       \
-            decode(element_opt._ok, kv.val);                                        \
+            decode(element_opt._ok, kv.val());                                      \
         }
 
         ustd_encode_property(0);

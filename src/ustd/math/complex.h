@@ -5,12 +5,14 @@
 namespace ustd::math
 {
 
-#ifdef __clang__
+#ifndef __INTELLISENSE__
 constexpr _Complex float  _cf32 = 0;
 constexpr _Complex double _cf64 = 0;
 using cf32 = decltype(_cf32);
 using cf64 = decltype(_cf64);
-#else
+#endif
+
+#ifdef __INTELLISENSE__
 using cf32 = _Fcomplex;
 using cf64 = _Dcomplex;
 #endif

@@ -7,7 +7,7 @@
 #ifndef USTD_CUDA_KERNEL
 #   include "ustd/core.h"
 #   include "ustd/cuda/api.h"
-#   include "ustd/cuda/array.h"
+#   include "ustd/cuda/ndarray.h"
 #   include "ustd/cuda/tex.h"
 #endif
 

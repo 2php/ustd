@@ -254,9 +254,9 @@ private:
 
         if (I!=0) indent();
 
-        push_str(kv.key);
+        push_str(kv.key());
         push_str(": ");
-        (*this)(kv.val);
+        (*this)(kv.val());
 
         let is_last = (I + 1 == T::$property_cnt);
         push_str(is_last ? str("\n") : str(",\n"));

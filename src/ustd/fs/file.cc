@@ -178,7 +178,7 @@ pub fn File::size() const noexcept -> u64 {
 
 #ifdef _UCRT
     struct ::_stat64 st;
-    let eid = ::_stat64(int(_fid), &st);
+    let eid = ::_fstat64(int(_fid), &st);
 #else
     struct ::stat st;
     let eid = ::fstat(int(_fid), &st);
