@@ -1,10 +1,14 @@
 
 #include "config.inl"
 
+#ifdef USTD_OS_WINDOWS
+
 extern "C" fn GetLastError() -> i32;
 
 namespace ustd::os::windows
 {
+
+
 
 pub fn get_error() noexcept -> Error {
     // @see: https://msdn.microsoft.com/en-us/library/windows/desktop/ms681381(v=vs.85).aspx
@@ -20,3 +24,5 @@ pub fn get_error() noexcept -> Error {
 }
 
 }
+
+#endif

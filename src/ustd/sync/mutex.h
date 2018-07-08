@@ -20,7 +20,6 @@ public:
     class Guard;
 
     mtx_t   _mtx;
-    u32     _idx;
 
     enum {
         ConsoleIdx = 1
@@ -28,20 +27,9 @@ public:
 
     pub Mutex()  noexcept;
     pub ~Mutex() noexcept;
+    pub Mutex(Mutex&& other) noexcept;
 
-    Mutex(Mutex&& other) noexcept: _mtx(other._mtx), _idx(other._idx) {
-        other._idx = 0;
-    }
-
-    fn operator==(const Mutex& other) const noexcept -> bool {
-        return _idx == other._idx;
-    }
-
-    pub fn to_str() const noexcept -> FixedStr<32>;
-
-    pub fn lock() noexcept -> Result<Guard>;
-
-protected:
+    pub fn lock()   noexcept -> Result<Guard>;
     pub fn unlock() noexcept -> Result<void>;
 };
 
@@ -50,30 +38,15 @@ class Mutex::Guard
 public:
     Mutex* _mtx;
 
-    Guard(Guard&& other) noexcept : _mtx(other._mtx) {
-        other._mtx = nullptr;
-    }
+    pub Guard(Guard&& other) noexcept;
+    pub ~Guard() noexcept;
 
-    ~Guard() noexcept {
-        if (_mtx == nullptr) return;
-        _mtx->unlock();
-    }
-
-    fn unlock() noexcept -> void {
-        if (_mtx == nullptr) return;
-        _mtx->unlock();
-        _mtx = nullptr;
-    }
-
-    fn forget() noexcept -> void {
-        _mtx = nullptr;
-    }
+    pub fn unlock() noexcept -> void;
+    pub fn forget() noexcept -> void;
 
 protected:
     friend class Mutex;
-
-    Guard(Mutex& mtx) noexcept : _mtx(&mtx)
-    {}
+    pub Guard(Mutex* mtx) noexcept;
 };
 
 using MutexGuard = Mutex::Guard;

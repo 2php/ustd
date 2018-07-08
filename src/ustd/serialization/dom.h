@@ -266,7 +266,7 @@ struct Dom
 
     template<class T>
     fn as() const noexcept -> Result<T> {
-        return node.as<T>();
+        return _nodes[_index].as<T>();
     }
 #pragma endregion
 

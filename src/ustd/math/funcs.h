@@ -66,15 +66,4 @@ struct Pow   { template<class A, class B> fn operator()(A a, B b) noexcept { ret
 
 }
 
-template<u32 ...I, class T, u32 N>
-fn idx_norm(immut_t<u32, I...>, vec<T, N> v) noexcept -> T {
-    let norm2_val = ustd::sum((v[I]*v[I])...);
-    return math::sqrt(norm2_val);
-}
-
-template<class T, u32 N>
-fn vnorm(vec<T, N> v) noexcept -> T {
-    return idx_norm(seq_t<N>{}, v);
-}
-
 }

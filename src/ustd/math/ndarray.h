@@ -7,12 +7,11 @@ namespace ustd::math
 {
 
 template<typename T, u32 N = 1>
-class NDArray
-    : public NDSlice<T, N>
+class NDArray: public NDSlice<T, N>
 {
 public:
     using base   = NDSlice<T, N>;
-    using dims_t = typename base::dims_t;
+    using u32xN  = typename base::u32xN;
 
     NDArray(NDArray&& other) noexcept : base(other) {
         other._data = nullptr;
@@ -25,11 +24,11 @@ public:
         ustd::mdel(base::_data);
     }
 
-    static fn with_dims(const dims_t& dims) noexcept -> NDArray {
+    static fn with_dims(const u32xN& dims) noexcept -> NDArray {
         return NDArray(dims);
     }
 
-    fn resize(const dims_t& dims) -> NDArray& {
+    fn resize(const u32xN& dims) -> NDArray& {
         mut tmp = NDArray(dims);
         ustd::swap(*this, tmp);
         return *this;
@@ -41,7 +40,7 @@ public:
     }
 
 protected:
-    NDArray(const dims_t& dims) noexcept : base(nullptr, dims) {
+    explicit NDArray(const u32xN& dims) noexcept : base(nullptr, dims) {
         let cnt = base::count();
         if (cnt != 0) {
             base::_data = ustd::mnew<T>(dims);

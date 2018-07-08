@@ -31,17 +31,11 @@ public:
 
     static pub fn instance() noexcept -> Logger&;
 
-    // property[rw]: level
-    __declspec(property(get = get_level, put = set_level)) Level level;
-    fn get_level() const noexcept -> Level {
+    fn level() const noexcept -> Level {
         return _level;
-    }
-    fn set_level(Level level) noexcept -> void {
-        _level = level;
     }
 
     // property[w]: path
-    __declspec(property(put = set_path)) fs::Path path;
     pub fn set_path(fs::Path path) noexcept -> void;
 
     template<class ...U> void trace(str fmt, const U& ...args) noexcept { log_fmt(Level::Trace, fmt, args...); }

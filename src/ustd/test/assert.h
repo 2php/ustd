@@ -5,18 +5,17 @@
 namespace ustd::test
 {
 
+fn compare(f64 a, f64 b) -> bool;
+
 template<class T, class U>
 fn compare(const T& a, const U& b) -> bool {
     if constexpr(trait<T>::$float && trait<U>::$float) {
-        let base = f64((ustd::abs(a) + ustd::abs(b)) / 2);
-        let diff = f64(ustd::abs(a - b));
-        let fpc  = fpclassify(base);
-        if (fpc == FP::$zero)   return true;
-        if (fpc != FP::$normal) return false;
-        return diff / base < 1e-6;
+        let ret = compare(f64(a), f64(b));
+        return ret;
     }
     else {
-        return bool(a == b);
+        let ret = bool(a == b);
+        return ret;
     }
 }
 

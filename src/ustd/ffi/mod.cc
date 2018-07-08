@@ -50,10 +50,10 @@ pub Mod::Mod(str name) noexcept {
 
     _mod = mod_t(reinterpret_cast<u64>(::dlopen(full_path._data, RTLD_LAZY)));
     if (_mod == mod_t(0)) {
-        log::error("ustd::ffi::Mod[{}].ctor(name={}): cannot load library.", this, name);
+        log::error("ustd::ffi::Mod[{}].ctor(name={s}): cannot load library.", this, name);
         return;
     }
-    log::info("ustd::ffi::Mod[{}].ctor(name={}): success", this, name);
+    log::info("ustd::ffi::Mod[{}].ctor(name={s}): success", this, name);
 
     let mod_init_opt = get_fn("mod_init");
     if (mod_init_opt.is_some()) {

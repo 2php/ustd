@@ -35,6 +35,38 @@ struct vec
 };
 
 template<typename T>
+struct vec<T,1>
+{
+    static constexpr let $rank = 1;
+    union {
+        T _arr[$rank];
+        struct { T x;  };
+    };
+
+    vec() noexcept = default;
+
+    template<u32 ...I, class V>
+    vec(immut_t<u32, I...>, const V& v) noexcept
+        : _arr{ T(v[I])... }
+    {}
+
+    vec(const T(&arr)[$rank]) noexcept : vec(seq_t<$rank>{}, arr)
+    {}
+
+    template<class ...Us, class = when<1 + sizeof...(Us) == $rank> >
+    vec(const T& t) noexcept
+        : _arr{ t}
+    {}
+
+    explicit operator bool() const noexcept {
+        return ustd::idx_reduce<ops::And>(seq_t<$rank>{}, _arr);
+    }
+
+    fn operator[](u32 idx)       noexcept ->       T& { return _arr[idx]; }
+    fn operator[](u32 idx) const noexcept -> const T& { return _arr[idx]; }
+};
+
+template<typename T>
 struct vec<T,2>
 {
     static constexpr let $rank = 2;
@@ -54,7 +86,7 @@ struct vec<T,2>
     {}
 
     template<class ...Us, class = when<1 + sizeof...(Us) == $rank> >
-    vec(const T &t, const Us& ...s) noexcept
+    vec(const T& t, const Us& ...s) noexcept
         : _arr{ t, s... }
     {}
 
@@ -86,7 +118,7 @@ struct vec<T, 3>
     {}
 
     template<class ...Us, class = when<1 + sizeof...(Us) == $rank> >
-    vec(const T &t, const Us& ...s) noexcept
+    vec(const T& t, const Us& ...s) noexcept
         : _arr{ t, s... }
     {}
 
@@ -118,7 +150,7 @@ struct vec<T, 4>
     {}
 
     template<class ...Us, class = when<1 + sizeof...(Us) == $rank> >
-    vec(const T &t, const Us& ...s) noexcept
+    vec(const T& t, const Us& ...s) noexcept
         : _arr{ t, s... }
     {}
 

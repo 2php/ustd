@@ -4,8 +4,12 @@
 #pragma clang diagnostic ignored "-Wunused-local-typedef"
 #pragma clang diagnostic ignored "-Wmicrosoft-union-member-reference"
 
+#if defined(_MSC_VERR) && defined(__INTELLISENSE__)
+#   define USTD_MSVC_INTELLISENSE   1
+#endif
+
 /* attribute */
-#ifdef __INTELLISENSE__
+#ifdef USTD_MSVC_INTELLISENSE
 #   define __attribute__(...)
 #endif
 
@@ -27,7 +31,7 @@
 #define fn  auto
 
 /* builtin */
-#if defined(__INTELLISENSE__)
+#ifdef USTD_MSVC_INTELLISENSE
 #   define ustd_builtin(f) ::f
 #else
 #   define ustd_builtin(f) __builtin_##f
@@ -41,16 +45,16 @@ fn operator delete[](void*, void*)                 -> void ;
 namespace ustd
 {
 
-#ifdef __INTELLISENSE__
-#define __INT8_TYPE__   __int8
-#define __INT16_TYPE__  __int16
-#define __INT32_TYPE__  __int32
-#define __INT64_TYPE__  __int64
+#ifdef USTD_MSVC_INTELLISENSE
+#   define __INT8_TYPE__   __int8
+#   define __INT16_TYPE__  __int16
+#   define __INT32_TYPE__  __int32
+#   define __INT64_TYPE__  __int64
 
-#define __UINT8_TYPE__  unsigned __int8
-#define __UINT16_TYPE__ unsigned __int16
-#define __UINT32_TYPE__ unsigned __int32
-#define __UINT64_TYPE__ unsigned __int64
+#   define __UINT8_TYPE__  unsigned __int8
+#   define __UINT16_TYPE__ unsigned __int16
+#   define __UINT32_TYPE__ unsigned __int32
+#   define __UINT64_TYPE__ unsigned __int64
 #endif
 
 #pragma region types: primitive types
@@ -93,11 +97,7 @@ constexpr fn declval() noexcept -> T& {
 
 #pragma endregion
 
-#pragma region when
-template<bool X> struct when_t;
-template<>       struct when_t<true> { using type = void; };
-template<bool X> using  when = typename when_t<X>::type;
-#pragma endregion
+
 
 #pragma region $is_same
 template<typename T, typename U> struct _is_same { static constexpr let $value = false; };
@@ -110,6 +110,16 @@ constexpr static let $is_same = _is_same<T, U>::$value;
 #pragma region $is_base
 template<class B, class T>
 constexpr static let $is_base = bool(__is_base_of(B, T));
+#pragma endregion
+
+#pragma region when
+template<bool X> struct when_t;
+template<>       struct when_t<true> { using type = void; };
+template<bool X> using  when = typename when_t<X>::type;
+
+template<typename T, typename U> using when_same = when<$is_same<T,U>>;
+template<typename T, typename U> using when_base = when<$is_base<T,U>>;
+
 #pragma endregion
 
 #pragma region trival

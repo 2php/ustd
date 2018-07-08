@@ -28,7 +28,7 @@ static fn to_sgr(Level level) noexcept -> io::SGR {
         case Error: res = SGR::FG_RED; break;
         case Fatal: res = SGR::BG_RED; break;
     }
-    return SGR::RST;
+    return res;
 }
 
 static fn to_title(Level level) noexcept -> str {
@@ -80,10 +80,6 @@ pub fn Logger::set_path(fs::Path path) noexcept -> void {
 }
 
 pub fn Logger::log_msg(Level level, str text) noexcept -> void {
-    if (level < _level) {
-        return;
-    }
-
     let title_sgr   = to_sgr(level);
     let title_text  = to_title(level);
     let body_sgr    = io::SGR::RST;
@@ -104,6 +100,15 @@ pub fn Logger::log_msg(io::SGR title_sgr, str title_text, io::SGR body_sgr, str 
     if (_file_opt.is_some()) {
         _file_opt._val.write_fmt("{>12.3} [{}] {}", time_secs, title_text, body_text);
     }
+}
+
+ustd_test(console_color) {
+    log::trace("trace");
+    log::debug("debug");
+    log::info("debug");
+    log::warn("warn");
+    log::error("error");
+    log::fatal("fatal");
 }
 
 }

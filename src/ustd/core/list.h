@@ -49,7 +49,7 @@ public:
     }
 
     // ctor: with_capacity
-    static fn with_capacity(size_t capacity) noexcept -> List {
+    static fn with_capacity(u32 capacity) noexcept -> List {
         let data = mnew<T>(capacity);
         return List{ data, 0u, capacity };
    }

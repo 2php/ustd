@@ -54,10 +54,10 @@ pub fn _mdel(Type type, void* raw) noexcept -> void {
         if (ptr != nullptr) {
             ::__builtin_operator_delete(raw);
         }
-        log::debug("ustd::mem::mdel<{}>(ptr=`{}`) -> Ok()", type, ptr);
+        log::trace("ustd::mem::mdel<{}>(ptr={}) -> Ok()", type, ptr);
     }
     catch(...) {
-        log::error("ustd::mem::mdel<{}>(ptr=`{}`) -> Error()", type, ptr);
+        log::error("ustd::mem::mdel<{}>(ptr={}) -> Error()", type, ptr);
         return;
     }
 }

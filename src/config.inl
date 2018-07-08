@@ -35,7 +35,11 @@
 // pthread
 #if !defined(_WIN32) && __has_include(<pthread.h>)
 #   include <pthread.h>
+#endif
 
+// time
+#if __has_include(<sys/time.h>)
+#   include <sys/time.h>
 #endif
 
 // msvc: complex

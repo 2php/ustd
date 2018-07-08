@@ -1,8 +1,8 @@
 #pragma once
 
-#include "ustd/os/os_posix.h"
-#include "ustd/os/os_unix.h"
-#include "ustd/os/os_win32.h"
+#include "ustd/os/posix.h"
+#include "ustd/os/unix.h"
+#include "ustd/os/windows.h"
 
 namespace ustd::os
 {
@@ -14,11 +14,13 @@ using namespace windows;
 
 #if defined(__linux) || defined(__linux__)
 #define USTD_OS_LINUX
+#define USTD_OS_UNIX
 using namespace linux;
 #endif
 
 #if defined(__APPLE__)
 #define USTD_OS_MACOS
+#define USTD_OS_UNIX
 using namespace macos;
 #endif
 

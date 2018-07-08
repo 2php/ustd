@@ -1,18 +1,18 @@
 #pragma once
 
-#include "ustd/core.h"
+#include "ustd/core/builtin.h"
 
 namespace ustd::math
 {
 
-#ifndef __INTELLISENSE__
+#ifndef USTD_MSVC_INTELLISENSE
 constexpr _Complex float  _cf32 = 0;
 constexpr _Complex double _cf64 = 0;
 using cf32 = decltype(_cf32);
 using cf64 = decltype(_cf64);
 #endif
 
-#ifdef __INTELLISENSE__
+#ifdef USTD_MSVC_INTELLISENSE
 using cf32 = _Fcomplex;
 using cf64 = _Dcomplex;
 #endif

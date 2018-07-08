@@ -38,13 +38,14 @@ public:
     // ctor[move]
     Option(Option&& other) noexcept: _valid(other._valid), _nil() {
         if (!_valid) return;
+        ustd::ctor(&_val, as_mov(other._val));
         new(&_val)T(as_mov(other._val));
     }
 
     // ctor[copy]
     Option(const Option& other) noexcept _if(trait<T>::$copy): _valid(other._valid), _nil() {
         if (!_valid) return;
-        new(&_val)T(other._val);
+        ustd::ctor(&_val, other._val);
     }
 
     ~Option() {

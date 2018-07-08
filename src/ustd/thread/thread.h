@@ -31,18 +31,13 @@ struct Thread
     constexpr Thread(const Thread& other) noexcept: _thr(other._thr)
     {}
 
-    constexpr Thread(Thread&& other)noexcept: _thr(other._thr) {
+    constexpr Thread(Thread&& other) noexcept: _thr(other._thr) {
         other._thr = thr_t::Invalid;
     }
 
-    pub fn id()                 const noexcept -> u64;
-
-    pub fn name()               const noexcept -> FixedStr<256>;
-    pub fn set_name(str name)         noexcept -> void;
-
-    pub fn is_valid()           const noexcept -> bool;
-    pub fn detach()                   noexcept -> void;
-    pub fn join()                     noexcept -> Result<void>;
+    pub fn is_valid()   const noexcept -> bool;
+    pub fn detach()           noexcept -> void;
+    pub fn join()             noexcept -> Result<void>;
 
 };
 
@@ -120,8 +115,8 @@ pub fn current()    noexcept -> Thread;
 pub fn yield()      noexcept -> void;
 
 template<typename F, class R = decltype(declval<val_t<F>>()())>
-fn spawn(F&& func, str name = "") noexcept -> JoinHandle<R> {
-    let thr_builder = Builder().set_stack(0).set_name(name);
+fn spawn(F&& func) noexcept -> JoinHandle<R> {
+    let thr_builder = Builder().set_stack(0);
     return thr_builder.spawn(as_fwd<F>(func));
 }
 

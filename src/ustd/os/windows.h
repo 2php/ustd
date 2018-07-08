@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ustd/core.h"
-#include "ustd/os/os_posix.h"
+#include "ustd/os/posix.h"
 
 namespace ustd::os
 {

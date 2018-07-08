@@ -57,13 +57,14 @@ public:
 
     fn get_fn(str name) noexcept -> ffi::fun_t {
         if (_mod_opt.is_none()) {
+            log::error("ustd::cuda::Context::get_fn(name={}): cannot load `nvcuda`", name);
             return ffi::fun_t(0);
         }
 
         let& mod = _mod_opt._val;
         let  fid_opt = mod[name];
         if (fid_opt.is_none()) {
-            log::error("ustd::cuda::Context::get_fn(name={}): not found", name);
+            log::error("ustd::cuda::Context::get_fn(name={}): func not found", name);
             return ffi::fun_t(0);
         }
 
@@ -88,17 +89,28 @@ private:
     }
 
     fn driver_init() -> bool {
-        static let cu_init = ffi::Fn<Error(u32)>(get_fn("cuInit"));
+        static let cu_init_fid = get_fn("cuInit");
+        static let cu_init     = ffi::Fn<Error(u32)>(cu_init_fid);
+        if (cu_init_fid == ffi::fun_t(0)) {
+            log::error("ustd::cuda::Context.driver_init(): cannot find find `cuInit`");
+            return false;
+        }
+
         static let cu_init_eid = cu_init(0);
         if (cu_init_eid != Error::Success) {
-            log::error("ustd::cuda::Context.driver_init(): cannot init driver, error = {}", cu_init_eid);
+            log::error("ustd::cuda::Context.driver_init(): error = {}", cu_init_eid);
             return false;
         }
         return true;
     }
 
     fn device_init() -> bool {
-        let cu_dev_get = ffi::Fn<Error(dev_t*, int)>(get_fn("cuDeviceGet"));
+        static let cu_dev_get_fid = get_fn("cuDeviceGet");
+        static let cu_dev_get     = ffi::Fn<Error(dev_t*, int)>(cu_dev_get_fid);
+        if (cu_dev_get_fid == ffi::fun_t(0)) {
+            log::error("ustd::cuda::Context.device_init(): cannot find find `cuDeviceGet`");
+            return false;
+        }
 
         let cu_dev_eid = cu_dev_get(&_dev_id, 0);
         if (cu_dev_eid != Error::Success) {
@@ -111,7 +123,12 @@ private:
 
 
     fn ctx_init() -> bool {
-        let cu_ctx_create = ffi::Fn<Error(ctx_t* ctx, u32 flags, dev_t dev_id)>(get_fn("cuCtxCreate_v2"));
+        static let cu_ctx_create_fid = get_fn("cuCtxCreate_v2");
+        static let cu_ctx_create     = ffi::Fn<Error(ctx_t* ctx, u32 flags, dev_t dev_id)>(cu_ctx_create_fid);
+        if (cu_ctx_create_fid == ffi::fun_t(0)) {
+            log::error("ustd::cuda::Context.ctx_init(): cannot find find `cuCtxCreate_v2`");
+            return false;
+        }
 
         let eid = cu_ctx_create(&_ctx_id, 0u, _dev_id);
         if (eid != Error::Success) {
@@ -123,15 +140,25 @@ private:
     }
 
     fn ctx_destroy() -> void {
-        let cu_ctx_destroy = ffi::Fn<Error(ctx_t ctx)>(get_fn("cuCtxDestroy_v2"));
+        static let cu_ctx_destroy_fid = get_fn("cuCtxDestroy_v2");
+        static let cu_ctx_destroy     = ffi::Fn<Error(ctx_t ctx)>(cu_ctx_destroy_fid);
+        if (cu_ctx_destroy_fid == ffi::fun_t(0)) {
+            log::error("ustd::cuda::Context.ctx_destroy(): cannot find find `cuCtxDestroy_v2`");
+            return;
+        }
         cu_ctx_destroy(_ctx_id);
     }
 
     fn get_device_name() -> FixedStr<256> {
-        let cu_dev_name_get = ffi::Fn<Error(char* name, u32 len, dev_t id)>(get_fn("cuDeviceGetName"));
+        static let cu_dev_get_name_fid = get_fn("cuDeviceGetName");
+        static let cu_dev_get_name     = ffi::Fn<Error(char* name, u32 len, dev_t id)>(cu_dev_get_name_fid);
+        if (cu_dev_get_name_fid == ffi::fun_t(0)) {
+            log::error("ustd::cuda::Context.get_device_name(): cannot find find `cuDeviceGetName`");
+            return {};
+        }
 
         mut cu_dev_name = FixedStr<256>();
-        let cu_dev_name_eid = cu_dev_name_get(cu_dev_name._data, cu_dev_name._capacity, _dev_id);
+        let cu_dev_name_eid = cu_dev_get_name(cu_dev_name._data, cu_dev_name._capacity, _dev_id);
         if (cu_dev_name_eid != Error::Success) {
             log::error("ustd::cuda::Context.get_device_name(): cannot get device name, error={}", cu_dev_name_eid);
             return {};
@@ -141,10 +168,15 @@ private:
     }
 
     fn get_device_mem() -> u64 {
-        let cu_dev_mem_get = ffi::Fn<Error(u64* bytes, dev_t id)>(get_fn("cuDeviceTotalMem_v2"));
+        static let cu_dev_get_mem_fid = get_fn("cuDeviceTotalMem_v2");
+        static let cu_dev_get_mem     = ffi::Fn<Error(u64* bytes, dev_t id)>(cu_dev_get_mem_fid);
+        if (cu_dev_get_mem_fid == ffi::fun_t(0)) {
+            log::error("ustd::cuda::Context.get_device_mem(): cannot find find `cuDeviceTotalMem_v2`");
+            return 0;
+        }
 
         mut cu_dev_mem = u64(0);
-        let cu_dev_name_eid = cu_dev_mem_get(&cu_dev_mem, _dev_id);
+        let cu_dev_name_eid = cu_dev_get_mem(&cu_dev_mem, _dev_id);
         if (cu_dev_name_eid != Error::Success) {
             log::error("ustd::cuda::Context.get_device_mem(): error={}", cu_dev_name_eid);
             return 0;
@@ -156,7 +188,10 @@ private:
         let dev_name    = get_device_name();
         let dev_mem     = get_device_mem();
         let dev_mem_gb  = f64(dev_mem) / 1024.0f / 1024.0f / 1024.0f;
-        log::info("ustd::cuda: dev_name=`{}`, total_mem={.3}GB", dev_name, dev_mem_gb);
+
+        if (dev_mem != 0) {
+            log::info("ustd::cuda: dev_name=`{}`, total_mem={.3}GB", dev_name, dev_mem_gb);
+        }
         return true;
     }
 
@@ -181,10 +216,13 @@ static fn get_fn(str name) noexcept -> F* {
 }
 
 pub fn to_str(Error err_id) noexcept -> str {
-    static let cuGetErrorName = get_fn<Error(Error, const char**)>("cuGetErrorName");
+    static let cu_get_err_name = get_fn<Error(Error, const char**)>("cuGetErrorName");
+    if (cu_get_err_name == nullptr) {
+        return {};
+    }
 
     mut err_str  = static_cast<const char*>(nullptr);
-    let err_eid  = cuGetErrorName(err_id, &err_str);
+    let err_eid  = cu_get_err_name(err_id, &err_str);
 
     if (err_eid != Error::Success) {
         return "CudaErrorUnknow";
@@ -196,6 +234,9 @@ pub fn to_str(Error err_id) noexcept -> str {
 
 pub fn _sync() noexcept -> void {
     static let cu_ctx_sync = get_fn<Error()>("cuCtxSynchronize");
+    if (cu_ctx_sync == nullptr) {
+        return;
+    }
 
     mut eid = cu_ctx_sync();
     if (eid != Error::Success) {
@@ -225,6 +266,9 @@ pub fn set_stream(stream_t stream) noexcept -> void {
 #pragma region memory
 pub fn _dnew(Type type, u32 rank, const u64 dims[]) noexcept -> void* {
     static let cu_dev_malloc = get_fn<Error(void**, u64)>("cuMemAlloc_v2");
+    if (cu_dev_malloc == nullptr) {
+        return nullptr;
+    }
 
     let dims_list = make_dims_list(rank, dims);
     let total_cnt = get_total_cnt(rank, dims);
@@ -246,6 +290,9 @@ pub fn _dnew(Type type, u32 rank, const u64 dims[]) noexcept -> void* {
 
 pub fn _ddel(Type type, void* ptr) noexcept -> void {
     static let cu_dev_free = get_fn<Error(void*)>("cuMemFree_v2");
+    if (cu_dev_free == nullptr) {
+        return;
+    }
 
     if (ptr == nullptr) {
         return;
@@ -261,6 +308,9 @@ pub fn _ddel(Type type, void* ptr) noexcept -> void {
 
 pub fn _hnew(Type type, u32 rank, const u64 dims[]) noexcept -> void* {
     static let cu_host_malloc = get_fn<Error(void**, u64)>("cuMemAllocHost_v2");
+    if (cu_host_malloc == nullptr) {
+        return nullptr;
+    }
 
     let dims_list = make_dims_list(rank, dims);
     let total_cnt = get_total_cnt(rank, dims);
@@ -282,6 +332,9 @@ pub fn _hnew(Type type, u32 rank, const u64 dims[]) noexcept -> void* {
 
 pub fn _hdel(Type type, void* ptr) noexcept -> void {
     static let cu_host_free = get_fn<Error(void*)>("cuMemFreeHost");
+    if (cu_host_free == nullptr) {
+        return;
+    }
 
     if (ptr == nullptr) {
         return;
@@ -297,6 +350,9 @@ pub fn _hdel(Type type, void* ptr) noexcept -> void {
 
 pub fn _mcpy(Type type, void* dst, const void* src, u32 rank, const u64 dims[]) noexcept -> void {
     static let cu_memcpy = get_fn<Error(void* dst, const void* src, u64 size)>("cuMemcpy");
+    if (cu_memcpy == nullptr) {
+        return;
+    }
 
     let dims_list = make_dims_list(rank, dims);
     let total_cnt = get_total_cnt(rank, dims);
@@ -380,6 +436,9 @@ static fn get_array_fmt(Type type) -> arr_fmt_t {
 
 static fn arr_get_desc(arr_t arr) -> Result<arr_desc_t> {
     static let cu_arr_get_desc = get_fn<Error(arr_desc_t*, arr_t)>("cuArray3DGetDescriptor_v2");
+    if (cu_arr_get_desc == nullptr) {
+        return Result<arr_desc_t>::Err(Error::Invalid);
+    }
 
     mut desc = arr_desc_t{};
     let eid  = cu_arr_get_desc(&desc, arr);
@@ -392,6 +451,9 @@ static fn arr_get_desc(arr_t arr) -> Result<arr_desc_t> {
 
 pub fn _anew(Type type, u32 rank, const u64 dims[]) noexcept -> arr_t {
     static let cu_array_create = get_fn<Error(arr_t*, const arr_desc_t*)>("cuArray3DCreate_v2");
+    if (cu_array_create == nullptr) {
+        return arr_t(0);
+    }
 
     if (rank == 0 || dims[0] == 0) {
         return arr_t(0);
@@ -426,6 +488,9 @@ pub fn _anew(Type type, u32 rank, const u64 dims[]) noexcept -> arr_t {
 
 pub fn _adel(Type type, arr_t arr) noexcept -> void {
     static let cu_array_destroy = get_fn<Error(arr_t)>("cuArrayDestroy");
+    if (cu_array_destroy == nullptr) {
+        return;
+    }
 
     if (arr == arr_t(0)) {
         return;
@@ -473,6 +538,9 @@ struct mcpy_params_t {
 // ptr->arr
 pub fn _acpy(Type type, arr_t dst, const void* src, u32 rank, const u64 dims[]) noexcept -> void {
     static let cu_memcpy = get_fn<Error(const mcpy_params_t*)>("cuMemcpy3D_v2");
+    if (cu_memcpy == nullptr) {
+        return;
+    }
 
     // dims
     mut dims_list = FixedList<u32, 3>();
@@ -508,6 +576,9 @@ pub fn _acpy(Type type, arr_t dst, const void* src, u32 rank, const u64 dims[]) 
 // arr->ptr
 pub fn _acpy(Type type, void* dst, arr_t src, u32 rank, const u64 dims[]) noexcept -> void {
     static let cu_memcpy = get_fn<Error(const mcpy_params_t*)>("cuMemcpy3D_v2");
+    if (cu_memcpy == nullptr) {
+        return;
+    }
 
     // dims
     mut dims_list = FixedList<u32, 3>();
@@ -600,6 +671,9 @@ static fn get_res_format(arr_fmt_t type, u32 n) -> u32 {
 
 pub fn _tnew(Type type, arr_t arr, TexAddress address_mode, TexFilter filter_mode) noexcept -> tex_t {
     static let cu_tex_create = get_fn<Error(tex_t*, res_desc_t*, tex_desc_t*, res_view_t*)>("cuTexObjectCreate");
+    if (cu_tex_create == nullptr) {
+        return tex_t(0);
+    }
 
     mut tex = tex_t(0);
 
@@ -642,6 +716,10 @@ pub fn _tnew(Type type, arr_t arr, TexAddress address_mode, TexFilter filter_mod
 
 pub fn _tdel(Type type, tex_t tex) noexcept -> void {
     static let cu_tex_destroy = get_fn<Error(tex_t)>("cuTexObjectDestroy");
+    if (cu_tex_destroy == nullptr) {
+        return;
+    }
+
     let eid = cu_tex_destroy(tex);
     if (eid != Error::Success) {
         log::error("ustd::cuda::tdel<{}>(tex={}) -> Error({})", type, u32(tex), eid);

@@ -177,26 +177,26 @@ struct Slice
 
     // method: find
     template<class ...U>
-    fn find(U&& ...u) const noexcept -> Option<size_t> {
+    fn find(U&& ...u) const noexcept -> Option<u32> {
         let cnt = _size;
         for (mut i = 0u; i < cnt; ++i) {
             if (_data[i] == T(as_fwd<U>(u)...) ) {
-                return Option<size_t>::Some(i);
+                return Option<u32>::Some(i);
             }
         }
-        return Option<size_t>::None();
+        return Option<u32>::None();
     }
 
     // method: find
     template<class ...U>
-    fn rfind(U&& ...u) const noexcept -> Option<size_t> {
+    fn rfind(U&& ...u) const noexcept -> Option<u32> {
         let cnt = _size;
         for (mut i = cnt; i != 0; --i) {
             if (_data[i] == T(as_fwd<U>(u)...)) {
-                return Option<size_t>::Some(i);
+                return Option<u32>::Some(i);
             }
         }
-        return Option<size_t>::None();
+        return Option<u32>::None();
     }
 
 #pragma endregion
